@@ -886,6 +886,10 @@
                 <input type="date" id="dec_eff" value="2026-11-27" />
               </div>
               <div class="field full">
+                <label>🔐 رمز صلاحية موظف المصلحة (Authorization Key — لحماية القاعدة من التعديل غير المصرح)</label>
+                <input type="text" id="dec_officer_key" value="ETA-2026-OFFICER" autocomplete="off" />
+              </div>
+              <div class="field full">
                 <label>عنوان القرار أو الكتاب الدوري الجديد</label>
                 <input type="text" id="dec_title" value="تعليمات تنفيذية رقم 30 لسنة 2026 بتيسير فحص مستثمري التكنولوجيا" />
               </div>
@@ -1123,9 +1127,26 @@
         body: JSON.stringify(getFormPayload())
       });
       if (resp.ok) {
+        document.getElementById("proof-panel").className = "proof-panel";
         renderOptimization(await resp.json());
         loadMinistryAnalytics();
+      } else if (resp.status === 422) {
+        const panel = document.getElementById("proof-panel");
+        panel.className = "proof-panel danger";
+        document.getElementById("res-regime-title").textContent = "⚠️ القيمة المدخلة تتجاوز السقف القانوني المسموح به للتحليل الآلي (50 مليار ج.م)";
+        document.getElementById("res-proof-meta").textContent = "HTTP 422 Validation Guard: يرجى إدخال أرقام واقعية ضمن النطاق المسموح (0 إلى 50,000,000,000 ج.م).";
       }
+    }
+
+    function scrubClientPii(raw) {
+      const arDigits = "٠١٢٣٤٥٦٧٨٩";
+      let norm = String(raw ?? "").replace(/[٠-٩]/g, (d) => String(arDigits.indexOf(d)));
+      return norm
+        .replace(/\bEG\d{27}\b/gi, "[REDACTED-IBAN]")
+        .replace(/\b(?:\d{4}[-\s]?){3}\d{4}\b/g, "[REDACTED-CARD]")
+        .replace(/(?<!\d)[23]\d{13}(?!\d)/g, "[رقم قومي محجوب - قانون 151/2020]")
+        .replace(/(?<!\d)\d{3}-\d{3}-\d{3}(?!\d)/g, "[رقم تسجيل ضريبي محجوب]")
+        .replace(/(?<!\d)(?:\+?2)?01[0125]\d{8}(?!\d)/g, "[رقم هاتف محجوب]");
     }
 
     function appendMessage(role, htmlOrText, isEn = false, isRich = false) {
@@ -1187,7 +1208,8 @@
     async function sendChat(text) {
       const lang = document.getElementById("chat-lang").value;
       const llmMode = document.getElementById("chat-llm-mode").value;
-      appendMessage("user", text, false, false);
+      const displaySafeUserText = scrubClientPii(text);
+      appendMessage("user", displaySafeUserText, false, false);
 
       let pendingRow = null;
       if (llmMode !== "instant") {
@@ -1204,7 +1226,7 @@
         body: JSON.stringify({ message: text, lang, llm_mode: llmMode, conversation_history: chatHistory.slice(-6) })
       });
       if (pendingRow) pendingRow.remove();
-      chatHistory.push(text);
+      chatHistory.push(displaySafeUserText);
       if (resp.ok) {
         const data = await resp.json();
         const richHtml = formatRichText(data.reply_ar) + buildXrayHtml(data.dialect_xray) + buildSovereignBadgeHtml(data.sovereign_llm);
@@ -1293,6 +1315,7 @@
     }
 
     async function ingestDecree() {
+      const officerKey = (document.getElementById("dec_officer_key")?.value || "").trim();
       const payload = {
         doc_id: document.getElementById("dec_id").value.trim(),
         title: document.getElementById("dec_title").value.trim(),
@@ -1300,16 +1323,22 @@
         raw_text: document.getElementById("dec_text").value.trim()
       };
       const resp = await fetch("/api/knowledge/ingest-decree", {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-ETA-Officer-Key": officerKey },
         body: JSON.stringify(payload)
       });
       const st = document.getElementById("decree-status");
       if (resp.ok) {
+        st.style.color = "var(--emerald-dark)";
         const d = await resp.json();
         st.textContent = `✓ تم التحديث الفوري دون إعادة بناء الحل! أُضيفت ${d.chunks_added} فقرات — إجمالي الفقرات الحية الآن: ${d.total_live_knowledge_chunks}.`;
         runOfficialSearch(payload.title);
+      } else if (resp.status === 403) {
+        st.style.color = "var(--danger)";
+        st.textContent = "🔒 مرفوض أمنياً (403 Forbidden): رمز صلاحية موظف مصلحة الضرائب غير صحيح.";
       } else {
-        st.textContent = "⚠️ تأكد من إدخال عنوان ونص كافٍ للقرار.";
+        st.style.color = "var(--gold)";
+        st.textContent = "⚠️ تعذر الحفظ (422): تأكد من إدخال رمز القرار، عنوان واضح (4 أحرف فأكثر)، ونص تشريعي لا يقل عن 20 حرفاً.";
       }
     }
 

@@ -6,10 +6,11 @@ Neuro-Symbolic Bilingual (AR/EN) Egyptian Tax Facilitation Platform:
   - Analytics Track: Top Frequent Questions, Regional Formalization, Official MoF 2027/28 Forecast, & SECC Security Gate
 """
 
+import hmac
 import os
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
@@ -268,13 +269,26 @@ def api_list_escalations():
     return JSONResponse(content={"escalations": list_escalations(20)})
 
 
+_OFFICER_AUTH_KEY = os.environ.get("MOYASSER_OFFICER_KEY", "ETA-2026-OFFICER")
+
+
 @app.post("/api/knowledge/ingest-decree")
-def api_ingest_decree(payload: HotReloadDecreePayload):
+def api_ingest_decree(
+    payload: HotReloadDecreePayload,
+    x_eta_officer_key: Optional[str] = Header(default=None, alias="X-ETA-Officer-Key"),
+):
+    provided_key = (x_eta_officer_key or "").strip()
+    if not provided_key or not hmac.compare_digest(provided_key.encode("utf-8"), _OFFICER_AUTH_KEY.encode("utf-8")):
+        raise HTTPException(
+            status_code=403,
+            detail="غير مصرح: تحديث قاعدة المعرفة التشريعية يتطلب رمز صلاحية موظف مصلحة الضرائب (X-ETA-Officer-Key).",
+        )
+    clean_title, _ = redact_pii(payload.title)
     clean_text, pii_rep = redact_pii(payload.raw_text)
     try:
         out = ingest_new_decree_hot_reload(
             doc_id=payload.doc_id,
-            title=payload.title,
+            title=clean_title,
             org=payload.org,
             effective_date=payload.effective_date,
             expiry_date=payload.expiry_date,

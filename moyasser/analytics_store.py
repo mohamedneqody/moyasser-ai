@@ -124,6 +124,9 @@ def _connect() -> sqlite3.Connection:
         "DELETE FROM policy_telemetry WHERE governorate LIKE '%''%' OR sector LIKE '%''%' "
         "OR governorate IN ('1', '0', 'test') OR sector IN ('1', '0', 'test')"
     )
+    conn.execute(
+        "DELETE FROM officer_escalations WHERE conversation_summary LIKE '%٢٩٩٠١٠١%' OR conversation_summary LIKE '%2990101%'"
+    )
 
     conn.commit()
     return conn

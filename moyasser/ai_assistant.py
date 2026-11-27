@@ -543,8 +543,9 @@ def answer_tax_question(
     oos = _check_out_of_scope(redacted_msg)
     if oos is not None:
         reason_ar, reason_en = oos
-        hist_preview = " | ".join((conversation_history or [])[-3:] + [redacted_msg])[:600]
-        summary_text = (
+        safe_hist = [redact_pii(str(h))[0] for h in (conversation_history or [])[-3:]]
+        hist_preview = " | ".join(safe_hist + [redacted_msg])[:600]
+        summary_text, _ = redact_pii(
             f"[{resolved_lang.upper()}] السبب: {reason_ar} | ملخص سياق المستفسر (محجوب البيانات الشخصية): {hist_preview}"
         )
         ticket = record_escalation(

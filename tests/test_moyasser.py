@@ -168,8 +168,20 @@ def test_real_pdf_upload_scanning_and_voice_query():
 
 
 def test_hot_reload_decree_ingestion_without_rebuild():
+    # Verify unauthenticated callers without X-ETA-Officer-Key are rejected with HTTP 403 Forbidden
+    r_unauth = client.post(
+        "/api/knowledge/ingest-decree",
+        json={
+            "doc_id": "UNAUTH_TEST",
+            "title": "محاولة تعديل بدون صلاحية موظف",
+            "raw_text": "هذا النص يجب رفضه أمنياً لعدم وجود رمز صلاحية موظف مصلحة الضرائب.",
+        },
+    )
+    assert r_unauth.status_code == 403
+
     r_ing = client.post(
         "/api/knowledge/ingest-decree",
+        headers={"X-ETA-Officer-Key": "ETA-2026-OFFICER"},
         json={
             "doc_id": "ETA_CIRCULAR_99_2026",
             "title": "كتاب دوري رقم 99 لسنة 2026 بشأن تيسيرات مصدري البرمجيات السحابية",
@@ -331,6 +343,7 @@ def test_qa_certification_regressions_all_fixed():
     # 4. Hot-reload decree title search ranks #1 & Analytics sanitizes fuzz governorates
     client.post(
         "/api/knowledge/ingest-decree",
+        headers={"X-ETA-Officer-Key": "ETA-2026-OFFICER"},
         json={
             "doc_id": "ETA_CIRCULAR_30_2026",
             "title": "تعليمات تنفيذية رقم 30 لسنة 2026 بتيسير فحص مستثمري التكنولوجيا",
@@ -349,5 +362,42 @@ def test_qa_certification_regressions_all_fixed():
     r_met = client.get("/api/models/metrics")
     assert r_met.status_code == 200
     assert "arabic_slot_bigru_tagger" in r_met.json()
+
+
+def test_redteam_pii_history_scrub_and_20m_boundary():
+    # 1. Multi-turn Arabic-Indic National ID in conversation_history MUST NEVER leak into Officer Escalation Queue!
+    r_esc = client.post(
+        "/api/chat",
+        json={
+            "message": "ما حكم حضانة الأطفال والنفقة؟",
+            "conversation_history": ["رقمي القومي ٢٩٩٠١٠١١٢٣٤٥٦٧ ومبيعاتي 15 مليون"],
+        },
+    )
+    assert r_esc.status_code == 200
+    esc_summary = r_esc.json()["escalation"]["conversation_summary"]
+    assert "٢٩٩٠١٠١١٢٣٤٥٦٧" not in esc_summary
+    assert "29901011234567" not in esc_summary
+    assert "محجوب" in esc_summary
+
+    # 2. Exact 20,000,000 EGP ceiling + unchecked vat_registered must NOT enable White List VAT
+    r_bound = client.post(
+        "/api/optimize",
+        json={
+            "annual_revenue_egp": 20_000_000,
+            "annual_expenses_egp": 11_000_000,
+            "dispute_principal_egp": 250_000,
+            "delay_penalties_egp": 600_000,
+            "has_old_dispute_or_penalties": False,
+            "vat_registered": False,
+            "vat_refund_claim_egp": 320_000,
+        },
+    )
+    assert r_bound.status_code == 200
+    b_comp = r_bound.json()["comparison"]
+    assert b_comp["recommended_regime"] == "STANDARD"
+    assert "20 مليون" in b_comp["recommended_regime_ar"]
+    assert b_comp["final_penalty_egp"] == 250_000
+    assert b_comp["vat_whitelist_eligible"] is False
+
 
 

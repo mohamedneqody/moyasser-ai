@@ -76,8 +76,8 @@ def optimize_tax_strategy(profile: TaxpayerProfile) -> Dict[str, Any]:
     re_standard_tax = (re_val * 250) // 10_000
     re_exempt_allowed = bool(re_val > 0 and profile.real_estate_first_degree)
 
-    # Package #2 White List fast 7-day VAT refund liquidity benefit (estimated financing value ~2% of unlocked cash)
-    whitelist_allowed = bool(profile.compliant_filing_history and (profile.vat_registered or vat_claim > 0))
+    # Package #2 White List fast 7-day VAT refund liquidity benefit (strictly requires active VAT registration)
+    whitelist_allowed = bool(profile.compliant_filing_history and profile.vat_registered)
     whitelist_liquidity_bonus = int(vat_claim * 0.02) if (whitelist_allowed and vat_claim > 0) else (100 if whitelist_allowed else 0)
 
     # Objective: minimize total EGP cash outflow
@@ -263,7 +263,11 @@ def optimize_tax_strategy(profile: TaxpayerProfile) -> Dict[str, Any]:
             "recommended_regime_ar": (
                 "النظام الضريبي المبسط (قانون 6 لسنة 2025)"
                 if optimal_regime == "SIMPLIFIED_LAW6"
-                else "النظام الضريبي العادي (الأوفر حسب هامش الربح)"
+                else (
+                    "النظام الضريبي العادي (الأوفر حسب هامش الربح)"
+                    if law6_eligible
+                    else "النظام الضريبي العادي (لتجاوز سقف الـ 20 مليون جنيه للانضمام الأولي)"
+                )
             ),
             "optimal_annual_tax_egp": optimal_income_tax,
             "annual_income_tax_savings_egp": income_tax_savings,
