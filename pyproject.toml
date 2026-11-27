@@ -4,17 +4,29 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "moyasser-ai"
-version = "1.0.0"
-description = "Moyasser AI — Neuro-Symbolic Formally Verified Egyptian Tax Facilitation & Optimization Copilot (Lean 4 + HiGHS MILP + Gemini AI + CyberGuard Verified)"
+version = "2.5.0"
+description = "Moyasser AI — Sovereign Bilingual Neuro-Symbolic Egyptian Tax Facilitation Copilot (Lean 4 + HiGHS MILP + Official RAG + Ollama)"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = "MIT"
 dependencies = [
     "fastapi>=0.110.0",
     "uvicorn>=0.29.0",
     "scipy>=1.11.0",
     "pydantic>=2.5.0",
     "httpx>=0.27.0",
+    "numpy>=1.26.0",
+    "pandas>=2.2.0",
+    "scikit-learn>=1.5.0",
+    "xgboost>=2.1.0",
+    "joblib>=1.4.0",
+    "pypdfium2>=4.30.0",
+    "torch>=2.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
 ]
 
 [tool.setuptools.packages.find]
