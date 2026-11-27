@@ -339,9 +339,12 @@ def get_official_mof_fiscal_forecast() -> Dict[str, Any]:
 
 
 def models_ready() -> Dict[str, bool]:
+    from .arabic_dialect_xray import _load_slot_bigru
+
     return {
         "official_eta_legal_rag": _load_official_rag_bundle() is not None,
         "official_mof_fiscal_forecaster": _load_mof_forecaster() is not None,
+        "pytorch_arabic_slot_bigru": _load_slot_bigru() is not None,
         "pytorch_arabic_intent": _load_intent_bundle() is not None,
         "xgboost_formalization": _load_formalization_clf() is not None,
         "xgboost_expense_estimator": _load_expense_reg() is not None,

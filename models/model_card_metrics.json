@@ -346,5 +346,20 @@
       "models/arabic_intent_mlp.pt (2,011 Egyptian colloquial citizen queries mapped to official Laws 5/6/7 & Package #2)",
       "models/sme_formalization_xgb.joblib + expense_estimator_xgb.joblib + tax_anomaly_iforest.joblib (6,000 privacy-safe SME profiles calibrated to published MoF 110K/450K/53K adoption stats & CAPMAS MSME distributions; ready for on-premise retraining inside ETA)."
     ]
+  },
+  "arabic_slot_bigru_tagger": {
+    "model_name": "PyTorch Bidirectional GRU Slot Tagger (ArabicSlotBiGRU)",
+    "artifact_path": "models/arabic_slot_bigru.pt",
+    "artifact_kb": 1054.8,
+    "train_seconds": 83.67,
+    "selected_test_metrics": {
+      "token_accuracy": 1.0,
+      "macro_f1": 1.0
+    },
+    "capabilities": [
+      "Bidirectional RTL+LTR role binding (handles both 'مبيعاتي 4 مليون' and '4 مليون مبيعات')",
+      "Egyptian spoken numbers ('مليون ونص', 'نص مليون', 'ميتين ألف')",
+      "Monthly (×12) & Daily (×300) auto-annualizer + Negation scope guard ('معليش غرامات')"
+    ]
   }
 }

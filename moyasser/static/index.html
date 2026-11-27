@@ -445,6 +445,26 @@
     .msg strong { color: #064e3b; }
     .msg.user strong { color: #ffffff; }
 
+    /* Dialect Grounding X-Ray Strip inside Chat */
+    .xray-box {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px dashed #94a3b8;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .xray-title { font-weight: 800; color: #0f172a; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .xray-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .x-pill {
+      padding: 4px 9px; border-radius: 8px; font-weight: 700; font-size: 11.5px;
+      border: 1px solid var(--border); background: #ffffff; color: var(--ink-2);
+    }
+    .x-pill.REV { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; }
+    .x-pill.EXP { background: #f0f9ff; border-color: #7dd3fc; color: #0c4a6e; }
+    .x-pill.PEN, .x-pill.PRINC { background: #fffbeb; border-color: #fcd34d; color: #92400e; }
+    .x-pill.NEG { background: #f1f5f9; border-color: #cbd5e1; color: #475569; }
+
     .followups-bar { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
     .composer-wrap {
       display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
@@ -588,6 +608,7 @@
           </h2>
 
           <div class="presets">
+            <button class="preset-btn chat-chip" style="border-color:#059669; background:#ecfdf5; color:#065f46;" data-q="ببيع في المطعم بحوالي ميتين ألف في الشهر ومصاريفي مليون ونص في السنة ومعليش أي غرامات">🔬 اختبار العامية الذكي: ميتين ألف شهرياً + مليون ونص + نفي غرامات</button>
             <button class="preset-btn chat-chip" data-q="عندي مطعم في الجيزة مبيعاته 4 مليون ومصاريفه 2.5 مليون وعليا غرامات 180 ألف وأصل ضريبة 100 ألف">🍽️ مطعم 4 مليون + تسوية غرامات</button>
             <button class="preset-btn chat-chip" data-q="أنا فريلانسر دخلي 900 ألف في السنة ولسه مفتحتش ملف ضريبي">💻 فريلانسر 900 ألف بدون ملف</button>
             <button class="preset-btn chat-chip" data-q="بعت شقة بـ 3 مليون لابني، عليا ضريبة تصرفات عقارية كام؟">🏠 بيع شقة لابني (درجة أولى)</button>
@@ -1123,6 +1144,19 @@
       });
     }
 
+    function buildXrayHtml(xray) {
+      if (!xray || ((!xray.spans || !xray.spans.length) && (!xray.negations_honored || !xray.negations_honored.length))) return "";
+      const spanPills = (xray.spans || []).map(s => {
+        const cls = s.negated ? "NEG" : (s.role_code || "");
+        return `<span class="x-pill ${escHtml(cls)}">«${escHtml(s.raw_phrase)}» ← <strong>${escHtml(s.role_ar)}: ${Number(s.extracted_egp || 0).toLocaleString("en-US")} ج.م</strong> (${escHtml(s.formula_note)} • ثقة ${escHtml(s.confidence_pct)}%)</span>`;
+      });
+      const negPills = (xray.negations_honored || []).map(n => `<span class="x-pill NEG">🛡️ ${escHtml(n)}</span>`);
+      return `<div class="xray-box">
+        <div class="xray-title">🔬 الأشعة الدلالية لفهم العامية المصرية (PyTorch BiGRU Slot X-Ray — إثبات ربط كل رقم بمعناه قبل Lean 4):</div>
+        <div class="xray-pills">${spanPills.concat(negPills).join("")}</div>
+      </div>`;
+    }
+
     async function sendChat(text) {
       const lang = document.getElementById("chat-lang").value;
       appendMessage("user", text, false, false);
@@ -1134,7 +1168,8 @@
       chatHistory.push(text);
       if (resp.ok) {
         const data = await resp.json();
-        appendMessage("bot", formatRichText(data.reply_ar), data.lang === "en", true);
+        const richHtml = formatRichText(data.reply_ar) + buildXrayHtml(data.dialect_xray);
+        appendMessage("bot", richHtml, data.lang === "en", true);
         renderFollowups(data.suggested_followups || []);
         if (data.optimization) renderOptimization(data.optimization);
         loadMinistryAnalytics();

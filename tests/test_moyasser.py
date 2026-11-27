@@ -210,7 +210,7 @@ def test_trained_6_models_and_security_headers_and_pitch_deck():
     h = r_health.json()
     assert h["lean4_theorems"] == 10
     assert h["ml_models_ready"] is True
-    assert len(h["ml_models"]) == 6
+    assert len(h["ml_models"]) == 7
 
     r_deck = client.get("/pitch-deck")
     assert r_deck.status_code == 200
@@ -220,3 +220,34 @@ def test_trained_6_models_and_security_headers_and_pitch_deck():
 
     r_html = client.post("/api/report/html", json={"business_name": "<img src=x onerror=alert(1)>", "annual_revenue_egp": 1_500_000})
     assert "<img src=x" not in r_html.text
+
+
+def test_killer_egyptian_dialect_xray_spoken_monthly_reversed_and_negation():
+    # 1. Spoken Egyptian numbers + Monthly (×12) auto-annualization + Negation scope!
+    r1 = client.post(
+        "/api/chat",
+        json={"message": "ببيع في المطعم بحوالي ميتين ألف في الشهر ومصاريفي مليون ونص في السنة ومعليش أي غرامات"},
+    )
+    assert r1.status_code == 200
+    d1 = r1.json()
+    prof1 = d1["optimization"]["profile"]
+    assert prof1["annual_revenue_egp"] == 2_400_000
+    assert prof1["annual_expenses_egp"] == 1_500_000
+    assert prof1["delay_penalties_egp"] == 0
+    assert len(d1["dialect_xray"]["negations_honored"]) >= 1
+    assert d1["optimization"]["lean4_verification"]["lean4_verified"] is True
+
+    # 2. Reversed Egyptian word order (numbers BEFORE labels!)
+    r2 = client.post(
+        "/api/chat",
+        json={"message": "بعمل 4 مليون مبيعات وبدفع 2 مليون مصاريف"},
+    )
+    assert r2.status_code == 200
+    prof2 = r2.json()["optimization"]["profile"]
+    assert prof2["annual_revenue_egp"] == 4_000_000
+    assert prof2["annual_expenses_egp"] == 2_000_000
+
+    # 3. Cliff-edge radar near 20M EGP ceiling (Lean 4 Theorem 9 24M EGP buffer)
+    r3 = client.post("/api/chat", json={"message": "شركتي مبيعاتها 19.5 مليون ومصاريفها 14 مليون"})
+    assert r3.status_code == 200
+    assert "24,000,000" in (r3.json().get("cliff_edge_alert") or "")

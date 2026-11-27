@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 
 from .analytics_store import record_escalation, record_question_topic
+from .arabic_dialect_xray import analyze_egyptian_dialect_xray, compute_cliff_edge_sensitivity_alert
 from .ml_models import (
     estimate_sector_expense_ratio,
     extract_pdf_bytes_text,
@@ -158,10 +159,35 @@ def extract_profile_from_arabic_text(
     message: str,
     base_profile: Optional[Dict[str, Any]] = None,
 ) -> Tuple[TaxpayerProfile, List[str]]:
-    """Bilingual (Egyptian Arabic + Investor English) Financial NLU Extractor."""
+    """Bilingual + PyTorch BiGRU Dialect X-Ray Financial NLU Extractor."""
+    xray = analyze_egyptian_dialect_xray(message or "")
+    slots = xray.get("slots_egp", {})
     text = normalize_arabic_numbers(message or "")
     base = dict(base_profile or {})
     signals: List[str] = []
+
+    # Pre-seed from BiGRU + Spoken Egyptian Number + Monthly/Daily X-Ray slots!
+    if slots.get("REV", 0) > 0:
+        base["annual_revenue_egp"] = slots["REV"]
+        signals.append(f"حجم الأعمال السنوي (BiGRU X-Ray): {slots['REV']:,} ج.م")
+    if slots.get("EXP", 0) > 0:
+        base["annual_expenses_egp"] = slots["EXP"]
+        signals.append(f"المصروفات السنوية (BiGRU X-Ray): {slots['EXP']:,} ج.م")
+    if slots.get("PRINC", 0) > 0:
+        base["dispute_principal_egp"] = slots["PRINC"]
+        base["has_old_dispute_or_penalties"] = True
+        signals.append(f"أصل الضريبة (BiGRU X-Ray): {slots['PRINC']:,} ج.م")
+    if slots.get("PEN", 0) > 0:
+        base["delay_penalties_egp"] = slots["PEN"]
+        base["has_old_dispute_or_penalties"] = True
+        signals.append(f"مقابل التأخير (BiGRU X-Ray): {slots['PEN']:,} ج.م")
+    if slots.get("RE_VAL", 0) > 0:
+        base["real_estate_sale_egp"] = slots["RE_VAL"]
+        signals.append(f"قيمة التصرف العقاري (BiGRU X-Ray): {slots['RE_VAL']:,} ج.م")
+    if slots.get("VAT", 0) > 0:
+        base["vat_refund_claim_egp"] = slots["VAT"]
+        base["vat_registered"] = True
+        signals.append(f"طلب رد قيمة مضافة (BiGRU X-Ray): {slots['VAT']:,} ج.م")
 
     rev = _find_labeled_amount(
         text,
@@ -171,7 +197,7 @@ def extract_profile_from_arabic_text(
             r"اجمالي\s*الفواتير", r"annual\s*revenue", r"revenue", r"turnover", r"total\s*sales", r"sales",
         ],
     )
-    if rev is not None:
+    if rev is not None and not slots.get("REV"):
         base["annual_revenue_egp"] = rev
         signals.append(f"حجم الأعمال السنوي: {rev:,} ج.م")
 
@@ -182,7 +208,7 @@ def extract_profile_from_arabic_text(
             r"نفقات(?:ه|ي|نا)?", r"annual\s*expenses", r"expenses", r"operating\s*costs", r"costs",
         ],
     )
-    if exp is not None:
+    if exp is not None and not slots.get("EXP"):
         base["annual_expenses_egp"] = exp
         signals.append(f"المصروفات السنوية: {exp:,} ج.م")
 
@@ -193,7 +219,7 @@ def extract_profile_from_arabic_text(
             r"نزاع\s*ب(?:قيمة|مبلغ)?", r"tax\s*principal", r"disputed\s*tax", r"principal",
         ],
     )
-    if principal is not None:
+    if principal is not None and not slots.get("PRINC"):
         base["dispute_principal_egp"] = principal
         base["has_old_dispute_or_penalties"] = True
         signals.append(f"أصل الضريبة المتنازع عليها: {principal:,} ج.م")
@@ -205,10 +231,18 @@ def extract_profile_from_arabic_text(
             r"delay\s*penalt(?:y|ies)", r"late\s*penalt(?:y|ies)", r"penalt(?:y|ies)",
         ],
     )
-    if penalties is not None:
+    if penalties is not None and not slots.get("PEN") and not xray.get("negations_honored"):
         base["delay_penalties_egp"] = penalties
         base["has_old_dispute_or_penalties"] = True
         signals.append(f"غرامات ومقابل التأخير: {penalties:,} ج.م")
+
+    # Honor explicit Egyptian Arabic negations (e.g. `ومعليش غرامات`)!
+    for neg_msg in xray.get("negations_honored", []):
+        signals.append(neg_msg)
+        if "التأخير" in neg_msg or "غرام" in neg_msg:
+            base["delay_penalties_egp"] = 0
+            if not base.get("dispute_principal_egp"):
+                base["has_old_dispute_or_penalties"] = False
 
     re_sale = _find_labeled_amount(
         text,
@@ -514,11 +548,13 @@ def answer_tax_question(
             "optimization": None,
         }
 
-    # 2. Predict Intent, Record FAQ Telemetry, Retrieve Verbatim Official PDF Clauses
+    # 2. Predict Intent, Run Dialect X-Ray, Record FAQ Telemetry, Retrieve Official Clauses
     intent_pred = predict_arabic_intent(redacted_msg)
+    dialect_xray = analyze_egyptian_dialect_xray(redacted_msg)
     record_question_topic(intent_pred["intent"])
     official_rag = search_official_eta_documents(redacted_msg, top_k=2)
     profile, signals = extract_profile_from_arabic_text(redacted_msg, base_profile=profile_override)
+    cliff_alert = compute_cliff_edge_sensitivity_alert(profile.annual_revenue_egp, profile.annual_expenses_egp)
 
     has_numbers = any(
         [
@@ -707,6 +743,9 @@ def answer_tax_question(
     for w_ar in opt.get("deadline_warnings_ar", []):
         lines.append(w_ar)
 
+    if cliff_alert:
+        lines.append(cliff_alert)
+
     if ml_intel.get("declaration_anomaly_guard", {}).get("is_anomalous"):
         lines.append(f"⚠️ {ml_intel['declaration_anomaly_guard']['warning_ar']}")
 
@@ -736,6 +775,8 @@ def answer_tax_question(
         "reply_ar": "\n".join(lines),
         "pii_protection": pii_report,
         "ml_intent": intent_pred,
+        "dialect_xray": dialect_xray,
+        "cliff_edge_alert": cliff_alert,
         "official_legal_passages": official_rag.get("matches", []),
         "suggested_followups": followups,
         "disclaimer": NON_BINDING_DISCLAIMER_AR,
