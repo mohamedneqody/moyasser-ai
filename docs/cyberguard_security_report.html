@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Moyasser AI v2.0 - SECC Security Gate Security Verification Report — http://127.0.0.1:8798</title>
+<style>
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background: #0b1120; color: #e2e8f0; margin: 0; padding: 32px; line-height: 1.5; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  .hero { background: linear-gradient(135deg, #111827, #1e293b); border: 1px solid #334155; border-radius: 14px; padding: 24px 28px; margin-bottom: 24px; }
+  .brand-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: rgba(56, 189, 248, 0.14); border: 1px solid rgba(56, 189, 248, 0.45); color: #38bdf8; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
+  .hero h1 { margin: 0 0 8px; font-size: 24px; }
+  .badge { display: inline-block; padding: 5px 12px; border-radius: 999px; font-weight: 700; font-size: 13px; }
+  .badge-vuln { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+  .badge-safe { background: #064e3b; color: #a7f3d0; border: 1px solid #10b981; }
+  .badge-warn { background: #78350f; color: #fde68a; border: 1px solid #f59e0b; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+  .stat { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 12px 14px; }
+  .stat label { display: block; font-size: 12px; color: #94a3b8; }
+  .stat span { font-size: 18px; font-weight: 700; }
+  .card { background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; break-inside: avoid; page-break-inside: avoid; }
+  .finding-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .sev { padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+  .sev-critical { background: #991b1b; color: #fff; }
+  .sev-high { background: #dc2626; color: #fff; }
+  .sev-medium { background: #d97706; color: #fff; }
+  .sev-low { background: #2563eb; color: #fff; }
+  .meta { color: #94a3b8; font-size: 13px; }
+  .meta-box { background: #0f172a; border-radius: 8px; padding: 10px 12px; font-size: 12px; margin: 10px 0; }
+  pre { background: #020617; border: 1px solid #1e293b; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; color: #cbd5e1; white-space: pre-wrap; word-break: break-word; }
+  code { color: #38bdf8; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid #1f2937; }
+  th { color: #94a3b8; font-weight: 600; }
+  .footer { margin-top: 24px; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #1e293b; padding-top: 16px; }
+  @media print { body { padding: 14px; background: #0b1120; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="brand-pill">Moyasser AI v2.0 - SECC Security Gate Security Verification</div>
+    <h1>Moyasser AI v2.0 - SECC Security Gate &mdash; Evidence-Based Security Verification Report</h1>
+    <div>Prepared for: <strong>Ministry of Finance Impact Hackathon (TAX-02)</strong> &middot; Target: <code>http://127.0.0.1:8798</code> &middot; Generated: 2026-11-27 11:14:26 UTC</div>
+    <p style="margin-top:12px"><span class="badge badge-safe">SECURE (HIGH)</span></p>
+    <p>All planned attack surfaces were tested; no exploitable vulnerabilities were reproduced.</p>
+    <div class="grid">
+      <div class="stat"><label>Confirmed Exploitable Findings</label><span>0</span></div>
+      <div class="stat"><label>Coverage Executed</label><span>15/15 (100.0%)</span></div>
+      <div class="stat"><label>Session Mode</label><span>Unauthenticated</span></div>
+      <div class="stat"><label>Engine Version</label><span>Moyasser AI v2.0 - SECC Security Gate 3.3</span></div>
+    </div>
+  </div>
+
+  <h2>1. Confirmed Vulnerabilities</h2>
+  <div class="card"><p>No confirmed exploitable vulnerabilities were reproduced within the executed scope.</p></div>
+
+  <h2>2. Coverage &amp; Execution Matrix</h2>
+  <div class="card" style="overflow-x:auto">
+    <table>
+      <thead><tr><th>Test ID</th><th>Category</th><th>Endpoint</th><th>Parameter</th><th>Execution</th><th>Evidence Status</th></tr></thead>
+      <tbody><tr><td><code>COV-XSS-01</code></td><td>XSS</td><td><code>POST /api/optimize</code></td><td><code>business_name</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-XSS-02</code></td><td>XSS</td><td><code>GET /</code></td><td><code>chat-input</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-XSS-03</code></td><td>XSS</td><td><code>GET /</code></td><td><code>btn-voice</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-XSS-04</code></td><td>XSS</td><td><code>GET /</code></td><td><code>chat-file-upload</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-XSS-05</code></td><td>XSS</td><td><code>GET /</code></td><td><code>rag-input</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-SQLI-06</code></td><td>SQLI</td><td><code>POST /api/optimize</code></td><td><code>dispute_principal_egp</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-IDOR-07</code></td><td>IDOR</td><td><code>GET /api/user/{id}/profile</code></td><td><code>user_id</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-UNAUTH-08</code></td><td>AUTH_BOUNDARY</td><td><code>GET /api/models/metrics</code></td><td><code>N/A</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-UNAUTH-09</code></td><td>AUTH_BOUNDARY</td><td><code>GET /api/officer/escalations</code></td><td><code>N/A</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-UNAUTH-10</code></td><td>AUTH_BOUNDARY</td><td><code>GET /api/official-data/fiscal-forecast</code></td><td><code>N/A</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-HDRS-11</code></td><td>SECURITY_HEADERS</td><td><code>GET /</code></td><td><code>HTTP_HEADERS</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-POSTURE-12</code></td><td>WEB_POSTURE</td><td><code>GET /</code></td><td><code>WEB_POSTURE</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-GSQLI-13</code></td><td>GENERAL_SQLI</td><td><code>POST /api/optimize</code></td><td><code>business_name</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-SSTI-14</code></td><td>SSTI</td><td><code>POST /api/optimize</code></td><td><code>business_name</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr><tr><td><code>COV-CMDI-15</code></td><td>CMDI</td><td><code>POST /api/optimize</code></td><td><code>dispute_principal_egp</code></td><td>EXECUTED</td><td>TOOL_EXECUTED</td></tr></tbody>
+    </table>
+  </div>
+  <div class="footer">
+    Prepared by <strong>Moyasser AI v2.0 - SECC Security Gate</strong> for <strong>Ministry of Finance Impact Hackathon (TAX-02)</strong> &middot; Zero-False-Positive Evidence Verification Engine v3.3
+  </div>
+</div>
+</body>
+</html>

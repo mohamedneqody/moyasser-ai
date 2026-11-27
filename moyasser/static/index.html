@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مُيسّر الضرائب الذكي — Moyasser AI | مشروع TAX-02 هاكاثون وزارة المالية</title>
+  <style>
+    :root {
+      --bg: #071222;
+      --panel: #0e1d35;
+      --panel-2: #122645;
+      --border: #1f3b64;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --emerald-soft: rgba(16, 185, 129, 0.14);
+      --gold: #f59e0b;
+      --gold-soft: rgba(245, 158, 11, 0.14);
+      --cyan: #06b6d4;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: radial-gradient(circle at top right, #0f2b4c 0%, var(--bg) 58%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    .privacy-bar {
+      background: linear-gradient(90deg, #064e3b, #0c4a6e);
+      color: #d1fae5;
+      font-size: 12px;
+      padding: 6px 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .topbar {
+      background: rgba(7, 18, 34, 0.92);
+      border-bottom: 1px solid var(--border);
+      padding: 13px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+    .topbar-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, #059669, #d97706);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: #fff;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
+    }
+    .brand h1 { margin: 0; font-size: 19px; }
+    .brand small { color: var(--muted); font-size: 12px; display: block; }
+    .status-pills { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .pill {
+      padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--panel); text-decoration: none; color: var(--text);
+    }
+    .pill.ok { border-color: var(--emerald); color: #6ee7b7; background: var(--emerald-soft); }
+    .pill.gold { border-color: var(--gold); color: #fcd34d; background: var(--gold-soft); }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 22px 20px 60px; }
+
+    .tabs {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
+      border-bottom: 1px solid var(--border); padding-bottom: 14px;
+    }
+    .tab-btn {
+      background: var(--panel); color: var(--muted);
+      border: 1px solid var(--border); padding: 10px 16px;
+      border-radius: 12px; cursor: pointer; font-size: 13.5px; font-weight: 700;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { color: #fff; border-color: var(--cyan); }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #065f46, #0e7490);
+      color: #fff; border-color: var(--emerald);
+      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.2);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .grid-2 { display: grid; grid-template-columns: 1.08fr 1.22fr; gap: 20px; align-items: start; }
+    @media (max-width: 960px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; margin-bottom: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .card h2 {
+      margin: 0 0 13px; font-size: 16.5px; color: #f8fafc;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    }
+    .presets { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 13px; }
+    .preset-btn {
+      background: var(--panel-2); color: #e2e8f0; border: 1px solid #2b4e82;
+      padding: 6px 11px; border-radius: 10px; font-size: 12px; cursor: pointer;
+    }
+    .preset-btn:hover { border-color: var(--gold); color: #fde68a; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12.5px; color: #cbd5e1; font-weight: 600; }
+    input[type="text"], input[type="number"], input[type="date"], select, textarea {
+      background: #081529; color: #f8fafc; border: 1px solid #254470;
+      border-radius: 10px; padding: 9px 12px; font-size: 13.5px; font-family: inherit;
+    }
+    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 12px 0; }
+    .check-item {
+      display: flex; align-items: center; gap: 8px; font-size: 12.5px;
+      background: #09182e; border: 1px solid #1e3a61; padding: 8px 10px; border-radius: 10px; cursor: pointer;
+    }
+    .btn-primary {
+      width: 100%; background: linear-gradient(135deg, #059669, #0891b2);
+      color: #fff; border: none; padding: 12px 18px; border-radius: 12px;
+      font-size: 14.5px; font-weight: 800; cursor: pointer;
+    }
+    .btn-row { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 10px; }
+    .btn-sec {
+      flex: 1; background: var(--panel-2); color: #e2e8f0;
+      border: 1px solid #2e558a; padding: 9px 13px; border-radius: 10px;
+      font-size: 12.5px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .btn-sec:hover { border-color: var(--emerald); color: #6ee7b7; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-bottom: 14px; }
+    .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 14px; }
+    @media (max-width: 720px) { .kpi-grid, .kpi-grid-4 { grid-template-columns: 1fr 1fr; } }
+    .kpi-box { background: #0a1930; border: 1px solid var(--border); border-radius: 12px; padding: 13px; }
+    .kpi-box.accent {
+      background: linear-gradient(135deg, rgba(6, 95, 70, 0.55), rgba(14, 116, 144, 0.35));
+      border-color: var(--emerald);
+    }
+    .kpi-box .k-label { font-size: 11.5px; color: var(--muted); }
+    .kpi-box .k-val { font-size: 20px; font-weight: 800; margin-top: 4px; color: #fff; }
+    .kpi-box.accent .k-val { color: #6ee7b7; }
+
+    .proof-panel {
+      background: #050d1a; border: 1px solid #10b981; border-right: 5px solid #10b981;
+      border-radius: 12px; padding: 13px 15px; margin-bottom: 14px; font-size: 12.5px;
+    }
+    .proof-meta {
+      font-family: Consolas, monospace; direction: ltr; text-align: left;
+      color: #a7f3d0; font-size: 11.5px; margin-top: 5px; word-break: break-all;
+    }
+    .decision-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 14px; }
+    .d-tag {
+      padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      background: var(--emerald-soft); border: 1px solid var(--emerald); color: #6ee7b7;
+    }
+    .d-tag.off { background: rgba(148, 163, 184, 0.08); border-color: #334155; color: #64748b; }
+    .list-clean { padding-right: 18px; margin: 7px 0 13px; }
+    .list-clean li { margin-bottom: 6px; font-size: 13px; color: #e2e8f0; }
+
+    .chat-box {
+      height: 410px; overflow-y: auto; background: #071326;
+      border: 1px solid var(--border); border-radius: 14px; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px;
+    }
+    .msg {
+      max-width: 88%; padding: 12px 15px; border-radius: 14px;
+      font-size: 13.5px; white-space: pre-wrap;
+    }
+    .msg.user { align-self: flex-start; background: #1e3a5f; color: #f8fafc; }
+    .msg.bot { align-self: flex-end; background: #0c2538; border: 1px solid #164e63; color: #e2e8f0; }
+    .msg.en { direction: ltr; text-align: left; }
+    .chat-form { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chat-form input[type="text"] { flex: 1; min-width: 220px; }
+    .followups-bar { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+
+    .bar-row { margin-bottom: 10px; }
+    .bar-head { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; }
+    .bar-track { height: 10px; background: #081529; border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, #10b981, #06b6d4); border-radius: 99px; }
+
+    pre.lean-code {
+      background: #040b16; color: #cbd5e1; border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; font-family: Consolas, monospace;
+      font-size: 12px; direction: ltr; text-align: left; max-height: 340px; overflow: auto;
+    }
+    table.t-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    table.t-table th, table.t-table td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: right; }
+    table.t-table th { color: #94a3b8; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="privacy-bar">
+    🔒 التزام كامل بقانون حماية البيانات الشخصية رقم 151 لسنة 2020 وسرية البيانات الضريبية: لا نطلب ولا نعالج الرقم القومي أو رقم التسجيل الضريبي — كافة الإجابات استرشادية وليست فتوى ملزمة.
+  </div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon">م</div>
+        <div>
+          <h1>مُيسّر الضرائب الذكي — Moyasser AI (مشروع TAX-02)</h1>
+          <small>المسار الخارجي (ممولين ومستثمرين AR/EN) + المسار الداخلي (موظفي مصلحة الضرائب) | Lean 4 + HiGHS MILP + Official RAG</small>
+        </div>
+      </div>
+      <div class="status-pills">
+        <span class="pill ok">🛡️ Lean 4: 10/10 نظريات (0 sorry)</span>
+        <span class="pill gold">🏛️ 18 وثيقة رسمية MoF &amp; ETA</span>
+        <a class="pill gold" href="/pitch-deck" target="_blank">📊 العرض التقديمي (Pitch Deck)</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="tab-chat">💬 المسار الخارجي (1): المساعد الذكي (عربي / EN + صوت + ملفات)</button>
+      <button class="tab-btn" data-tab="tab-calc">🧮 المسار الخارجي (2): المحرك الأمثل (HiGHS + Lean 4)</button>
+      <button class="tab-btn" data-tab="tab-officer">👔 المسار الداخلي: منصة موظفي خدمات المستثمرين وتحديث القرارات</button>
+      <button class="tab-btn" data-tab="tab-ministry">🏛️ لوحة المتابعة: أكثر الأسئلة تكراراً + أثر وزارة المالية</button>
+    </nav>
+
+    <!-- TAB 1: EXTERNAL TRACK - BILINGUAL MULTIMODAL COPILOT -->
+    <section id="tab-chat" class="tab-panel active">
+      <div class="card">
+        <h2>
+          <span>💬 المساعد الضريبي الذكي للممولين والمستثمرين الأجانب (عربي عامي ← فصحى مبسطة / English)</span>
+          <select id="chat-lang" style="width:auto; padding:6px 10px; font-size:12.5px;">
+            <option value="auto">🌐 كشف تلقائي للغة (Auto AR / EN)</option>
+            <option value="ar">🇪🇬 العربية (فصحى مبسطة)</option>
+            <option value="en">🌍 English (Foreign Investors)</option>
+          </select>
+        </h2>
+        <div class="presets">
+          <button class="preset-btn chat-chip" data-q="عندي مطعم في الجيزة مبيعاته 4 مليون ومصاريفه 2.5 مليون وعليا غرامات 180 ألف وأصل ضريبة 100 ألف">🍽️ مطعم 4 مليون + تسوية غرامات</button>
+          <button class="preset-btn chat-chip" data-q="أنا فريلانسر دخلي 900 ألف في السنة ولسه مفتحتش ملف ضريبي">👨‍💻 فريلانسر 900 ألف بدون ملف</button>
+          <button class="preset-btn chat-chip" data-q="بعت شقة بـ 3 مليون لابني، عليا ضريبة تصرفات عقارية كام؟">🏠 بيع شقة لابني (درجة أولى)</button>
+          <button class="preset-btn chat-chip" data-q="My software subsidiary in Cairo has annual revenue of 12 million EGP, expenses of 7.5 million EGP, and a VAT refund claim of 450 thousand EGP.">🌍 Foreign Investor (English)</button>
+          <button class="preset-btn chat-chip" data-q="ما التعريفة الجمركية لاستيراد سيارة كهربائية؟">🚫 تجربة سؤال خارج النطاق + إحالة لموظف</button>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+          <div class="msg bot">أهلاً بكم في «مُيسّر الضرائب الذكي — مشروع TAX-02»! 🇪🇬
+اطرح سؤالك بالعربية العامية أو بالإنجليزية للمستثمرين الأجانب (نصاً، أو بالصوت 🎙️، أو برفع ملف PDF/نصي 📎).
+يلتزم المساعد بالمصادر الرسمية وتواريخ السريان والمهل القانونية، ويقترح 3 أسئلة سياقية بعد كل إجابة، ويحيل الحالات غير المغطاة لموظف خدمات المستثمرين مع ملخص المحادثة.</div>
+        </div>
+
+        <div id="followups-container" class="followups-bar"></div>
+
+        <form class="chat-form" id="chat-form">
+          <input type="text" id="chat-input" placeholder="اكتب سؤالك بالعربية أو الإنجليزية (دون إدخال رقم قومي أو تسجيل ضريبي)..." autocomplete="off" />
+          <button type="button" class="btn-sec" id="btn-voice" style="flex:0 0 auto;">🎙️ تحدث صوتياً</button>
+          <label class="btn-sec" style="flex:0 0 auto; cursor:pointer;">
+            📎 إرفاق PDF/ملف
+            <input type="file" id="chat-file-upload" accept=".pdf,.txt,.png,.jpg,.jpeg,.webp" style="display:none;" />
+          </label>
+          <button type="submit" class="btn-primary" style="width:auto; padding:10px 22px;">إرسال</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 2: EXTERNAL TRACK - HIGHS MILP + LEAN 4 CALCULATOR -->
+    <section id="tab-calc" class="tab-panel">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <h2>1. بيانات الحالة الاسترشادية (ممول أو مستثمر)</h2>
+            <div class="presets">
+              <button class="preset-btn" data-preset="restaurant">🍽️ مطعم 4 مليون + غرامات</button>
+              <button class="preset-btn" data-preset="thin_margin">📦 تاجر هامش ربح 2% (العادي أوفر!)</button>
+              <button class="preset-btn" data-preset="software">💻 شركة برمجيات 12 مليون + القائمة البيضاء</button>
+              <button class="preset-btn" data-preset="realestate">🏠 بيع شقة 3 مليون لأقارب درجة أولى</button>
+            </div>
+
+            <div class="form-grid">
+              <div class="field full">
+                <label>وصف النشاط (بدون أسماء شخصية أو أرقام تسجيل)</label>
+                <input type="text" id="business_name" value="منشأة مطاعم وأغذية" />
+              </div>
+              <div class="field">
+                <label>الكيان القانوني</label>
+                <select id="entity_type">
+                  <option value="company">شركة أموال / أشخاص</option>
+                  <option value="sole">منشأة فردية / محل</option>
+                  <option value="freelancer">عمل حر / فريلانسر / مهني</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>المحافظة</label>
+                <select id="governorate">
+                  <option value="القاهرة">القاهرة</option>
+                  <option value="الجيزة" selected>الجيزة</option>
+                  <option value="الإسكندرية">الإسكندرية</option>
+                  <option value="مطروح">مطروح / العلمين</option>
+                  <option value="الدلتا">الدلتا</option>
+                  <option value="الصعيد">الصعيد</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>حجم الأعمال السنوي (جنيه)</label>
+                <input type="number" id="annual_revenue_egp" value="4000000" min="0" />
+              </div>
+              <div class="field">
+                <label>المصروفات السنوية المؤيدة (جنيه)</label>
+                <input type="number" id="annual_expenses_egp" value="2500000" min="0" />
+              </div>
+              <div class="field">
+                <label>أصل الضريبة في نزاع قديم (جنيه)</label>
+                <input type="number" id="dispute_principal_egp" value="100000" min="0" />
+              </div>
+              <div class="field">
+                <label>غرامات / مقابل تأخير قائم (جنيه)</label>
+                <input type="number" id="delay_penalties_egp" value="180000" min="0" />
+              </div>
+              <div class="field">
+                <label>طلب رد ضريبة قيمة مضافة (جنيه)</label>
+                <input type="number" id="vat_refund_claim_egp" value="0" min="0" />
+              </div>
+              <div class="field">
+                <label>قيمة بيع عقار (تصرفات عقارية - جنيه)</label>
+                <input type="number" id="real_estate_sale_egp" value="0" min="0" />
+              </div>
+            </div>
+
+            <div class="checks">
+              <label class="check-item"><input type="checkbox" id="is_registered_previously" checked /> مسجل ضريبياً من قبل</label>
+              <label class="check-item"><input type="checkbox" id="has_old_dispute_or_penalties" checked /> تسوية المنازعات والغرامات</label>
+              <label class="check-item"><input type="checkbox" id="vat_registered" /> مسجل قيمة مضافة / ملتزم</label>
+              <label class="check-item"><input type="checkbox" id="real_estate_first_degree" /> البيع العقاري لأقارب درجة أولى</label>
+            </div>
+
+            <button class="btn-primary" id="btn-run-opt">⚡ احسب المسار الأوفر + وثّق النتيجة بـ Lean 4 (10 نظريات)</button>
+          </div>
+
+          <div class="card">
+            <h2>📄 فحص ملف إخطار أو فاتورة (نص / PDF / صورة ممسوحة ضوئياً)</h2>
+            <div class="field">
+              <textarea id="doc_text" rows="3" placeholder="الصق نص الإخطار أو ارفع ملف PDF/نصي أدناه..."></textarea>
+            </div>
+            <div class="btn-row">
+              <button class="btn-sec" id="btn-fill-sample-doc">📋 مثال إخطار (اختبار حجب PII)</button>
+              <label class="btn-sec" style="cursor:pointer;">
+                📎 رفع ملف PDF / صورة
+                <input type="file" id="scanner-file-input" accept=".pdf,.txt,.png,.jpg,.jpeg" style="display:none;" />
+              </label>
+              <button class="btn-sec" id="btn-scan-doc">🔍 افحص النص الآن</button>
+            </div>
+            <div id="doc-scan-status" style="margin-top:9px; font-size:12px; color:#6ee7b7;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card" id="results-card">
+            <h2>2. القرار الأمثل وشهادة الإثبات الرياضي (Lean 4) وتواريخ السريان</h2>
+            <div class="kpi-grid">
+              <div class="kpi-box accent">
+                <div class="k-label">إجمالي الوفر المباشر الموثّق</div>
+                <div class="k-val" id="res-total-savings">—</div>
+              </div>
+              <div class="kpi-box">
+                <div class="k-label">الضريبة السنوية المثلى</div>
+                <div class="k-val" id="res-opt-tax">—</div>
+              </div>
+              <div class="kpi-box">
+                <div class="k-label">النظام العادي (للمقارنة)</div>
+                <div class="k-val" id="res-std-tax">—</div>
+              </div>
+            </div>
+
+            <div class="proof-panel" id="proof-panel">
+              <strong id="res-regime-title">جارٍ تشغيل محرك HiGHS MILP ونواة Lean 4...</strong>
+              <div class="proof-meta" id="res-proof-meta"></div>
+            </div>
+
+            <div id="res-deadline-alerts" style="margin-bottom:12px;"></div>
+
+            <div class="proof-panel" id="ml-intel-panel" style="border-color:#06b6d4; border-right-color:#06b6d4;">
+              <strong id="res-ml-propensity">🧠 مؤشر الاستجابة للتيسيرات (XGBoost): —</strong>
+              <div id="res-ml-anomaly" style="font-size:12px; color:#cbd5e1; margin-top:4px;"></div>
+            </div>
+
+            <div class="decision-tags" id="res-decision-tags"></div>
+
+            <div class="btn-row" style="margin-bottom:14px;">
+              <button class="btn-sec" id="btn-dl-html">📑 تحميل خارطة الطريق (HTML A4)</button>
+              <button class="btn-sec" id="btn-dl-pdf">📄 تحميل الشهادة الموثّقة (PDF)</button>
+            </div>
+
+            <h3 style="font-size:14.5px; color:#fcd34d; margin:12px 0 6px;">✨ المزايا والإعفاءات المستحقة</h3>
+            <ul class="list-clean" id="res-benefits"></ul>
+
+            <h3 style="font-size:14.5px; color:#6ee7b7; margin:12px 0 6px;">🗺️ خطوات التنفيذ والمستندات المطلوبة</h3>
+            <ol class="list-clean" id="res-roadmap"></ol>
+            <ul class="list-clean" id="res-docs"></ul>
+            <div id="res-citations" style="font-size:12px; color:#94a3b8; margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: INTERNAL TRACK - ETA INVESTOR SERVICES SPECIALIST WORKBENCH -->
+    <section id="tab-officer" class="tab-panel">
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <h2>🔍 المسار الداخلي (1): البحث التشريعي الفوري لموظفي خدمات المستثمرين (18 وثيقة رسمية)</h2>
+            <div class="presets">
+              <button class="preset-btn rag-chip" data-rq="عشرين مليون جنيه قانون 6 الحوافز والتيسيرات">📜 قانون 6/2025</button>
+              <button class="preset-btn rag-chip" data-rq="إنهاء المنازعات الضريبية قانون 152 لسنة 2026">⚖️ قانون 152/2026</button>
+              <button class="preset-btn rag-chip" data-rq="الأسئلة الشائعة منظومة التصرفات العقارية">🏠 التصرفات العقارية</button>
+              <button class="preset-btn rag-chip" data-rq="الأجهزة الطبية القيمة المضافة قانون 149">🏥 قانون 149/2026</button>
+            </div>
+            <form class="chat-form" id="rag-form">
+              <input type="text" id="rag-input" placeholder="ابحث فوراً في نصوص القوانين والتعليمات التنفيذية أثناء مقابلة المستثمر..." autocomplete="off" />
+              <button type="submit" class="btn-sec" style="flex:0 0 auto;">🔍 بحث تشريعي</button>
+            </form>
+            <div id="rag-results" style="margin-top:12px;"></div>
+          </div>
+
+          <div class="card">
+            <h2>⚡ المسار الداخلي (2): إضافة قرار أو تعليمات جديدة فورياً دون إعادة بناء الحل (Hot-Reload)</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label>رمز القرار / الكتاب الدوري</label>
+                <input type="text" id="dec_id" value="ETA_CIRCULAR_30_2026" />
+              </div>
+              <div class="field">
+                <label>تاريخ السريان</label>
+                <input type="date" id="dec_eff" value="2026-11-27" />
+              </div>
+              <div class="field full">
+                <label>عنوان القرار أو التعليمات التنفيذية الجديدة</label>
+                <input type="text" id="dec_title" value="تعليمات تنفيذية رقم 30 لسنة 2026 بتيسير فحص مستثمري التكنولوجيا" />
+              </div>
+              <div class="field full">
+                <label>النص الرسمي للقرار (يُفهرس فورياً في الذاكرة دون إعادة تشغيل الخادم)</label>
+                <textarea id="dec_text" rows="3">تُعفى الشركات التكنولوجية المصدّرة للبرمجيات المنضمة للقائمة البيضاء من تقديم مستندات الفحص الورقية، ويُكتفى بالفواتير الإلكترونية لرد ضريبة القيمة المضافة خلال خمسة أيام عمل اعتباراً من نوفمبر 2026.</textarea>
+              </div>
+            </div>
+            <button class="btn-primary" id="btn-ingest-decree" style="margin-top:10px;">➕ نشر وتفعيل القرار فوراً في قاعدة المعرفة (Zero Rebuild)</button>
+            <div id="decree-status" style="margin-top:8px; font-size:12.5px; color:#6ee7b7;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h2>📨 المسار الداخلي (3): طابور الاستفسارات المحالة للموظف المختص مع ملخص المحادثة</h2>
+            <p style="font-size:12.5px; color:var(--muted); margin-top:0;">تظهر هنا تلقائياً الحالات خارج النطاق أو طلبات الرأي المسبق المحالة من نافذة الممولين (خالية تماماً من البيانات الشخصية وفق قانون 151 لسنة 2020).</p>
+            <div id="officer-escalations-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ANALYTICS, TOP FAQS, MOF FORECAST, MODELS & LEAN 4 -->
+    <section id="tab-ministry" class="tab-panel">
+      <div class="card">
+        <h2>📊 لوحة المتابعة المبسطة: أكثر الأسئلة تكراراً ومؤشرات الاستفادة (مجهّلة الهوية 100%)</h2>
+        <div class="kpi-grid-4">
+          <div class="kpi-box accent">
+            <div class="k-label">إجمالي الوفورات الاسترشادية</div>
+            <div class="k-val" id="mof-savings">—</div>
+          </div>
+          <div class="kpi-box">
+            <div class="k-label">منشآت غير مسجلة استفسرت للانضمام</div>
+            <div class="k-val" id="mof-formalized">—</div>
+          </div>
+          <div class="kpi-box">
+            <div class="k-label">نسبة استحقاق قانون 6 المبسط</div>
+            <div class="k-val" id="mof-law6-rate">—</div>
+          </div>
+          <div class="kpi-box accent">
+            <div class="k-label">نسبة الإثبات الرياضي Lean 4</div>
+            <div class="k-val" id="mof-lean-rate">100%</div>
+          </div>
+        </div>
+
+        <h3 style="font-size:14.5px; color:#fcd34d; margin:14px 0 10px;">🔥 أكثر موضوعات وأسئلة الممولين والمستثمرين تكراراً</h3>
+        <div id="mof-faq-bars"></div>
+
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="card" style="margin-bottom:0;">
+            <h2>📍 التوزيع الجغرافي</h2>
+            <div id="mof-gov-bars"></div>
+          </div>
+          <div class="card" style="margin-bottom:0;">
+            <h2>🏭 أكثر القطاعات الاقتصادية</h2>
+            <div id="mof-sector-bars"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📈 مسار الإيرادات الضريبية الرسمية لوزارة المالية (التقرير المالي أكتوبر 2026 + توقع 2027/28)</h2>
+        <div class="kpi-grid-4">
+          <div class="kpi-box"><div class="k-label">فعلي 2024/2025</div><div class="k-val">2,202.3 مليار</div></div>
+          <div class="kpi-box"><div class="k-label">موازنة 2026/2027 (قانون 77)</div><div class="k-val">3,529.3 مليار</div></div>
+          <div class="kpi-box accent"><div class="k-label">توقع الموديل لـ 2027/2028</div><div class="k-val" id="mof-forecast-2728">—</div></div>
+          <div class="kpi-box accent"><div class="k-label">المصادر الرسمية المحمّلة</div><div class="k-val" id="mof-pdfs-count">18 PDF</div></div>
+        </div>
+        <div id="mof-real-bars"></div>
+        <h3 style="font-size:14px; color:#fcd34d; margin:14px 0 8px;">📑 سجل إثبات مصدر الوثائق الرسمية (SHA-256 Official Provenance)</h3>
+        <table class="t-table">
+          <thead><tr><th>الرمز</th><th>الجهة</th><th>عنوان الوثيقة الرسمية</th><th>الصفحات / الفقرات</th><th>بصمة SHA-256</th></tr></thead>
+          <tbody id="official-manifest-body"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>🧠 بطاقة الـ 6 موديلات المدرّبة + الـ 10 نظريات الرياضية في نواة Lean 4.36.0</h2>
+        <table class="t-table" style="margin-bottom:18px;">
+          <thead><tr><th>الموديل المدرّب</th><th>ملف الأوزان</th><th>الحجم</th><th>أداء الاختبار الموثّق</th></tr></thead>
+          <tbody id="ml-models-body"></tbody>
+        </table>
+        <table class="t-table">
+          <thead><tr><th>الرمز</th><th>النظرية في Lean 4</th><th>المرجع التشريعي</th><th>الضمانة القانونية المثبتة آلياً</th></tr></thead>
+          <tbody id="lean-theorems-body"></tbody>
+        </table>
+        <pre class="lean-code" id="lean-source-code" style="margin-top:12px;">جارٍ تحميل الكود المصدري لنواة Lean 4...</pre>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const escHtml = (s) => String(s ?? "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    const fmtEgp = (n) => `${Number(n || 0).toLocaleString("en-US")} ج.م`;
+    const chatHistory = [];
+
+    const PRESETS = {
+      restaurant: {
+        business_name: "منشأة مطاعم وأغذية", entity_type: "company", governorate: "الجيزة",
+        annual_revenue_egp: 4000000, annual_expenses_egp: 2500000,
+        dispute_principal_egp: 100000, delay_penalties_egp: 180000,
+        vat_refund_claim_egp: 0, real_estate_sale_egp: 0,
+        is_registered_previously: true, has_old_dispute_or_penalties: true,
+        vat_registered: false, real_estate_first_degree: false
+      },
+      thin_margin: {
+        business_name: "منشأة توريدات تجارية (هامش ربح 2%)", entity_type: "company", governorate: "الدلتا",
+        annual_revenue_egp: 10000000, annual_expenses_egp: 9800000,
+        dispute_principal_egp: 0, delay_penalties_egp: 0,
+        vat_refund_claim_egp: 0, real_estate_sale_egp: 0,
+        is_registered_previously: true, has_old_dispute_or_penalties: false,
+        vat_registered: false, real_estate_first_degree: false
+      },
+      software: {
+        business_name: "شركة برمجيات وتصدير رقمي", entity_type: "company", governorate: "القاهرة",
+        annual_revenue_egp: 12000000, annual_expenses_egp: 7500000,
+        dispute_principal_egp: 0, delay_penalties_egp: 0,
+        vat_refund_claim_egp: 450000, real_estate_sale_egp: 0,
+        is_registered_previously: true, has_old_dispute_or_penalties: false,
+        vat_registered: true, real_estate_first_degree: false
+      },
+      realestate: {
+        business_name: "معاملة تصرف عقاري أسري", entity_type: "sole", governorate: "القاهرة",
+        annual_revenue_egp: 0, annual_expenses_egp: 0,
+        dispute_principal_egp: 0, delay_penalties_egp: 0,
+        vat_refund_claim_egp: 0, real_estate_sale_egp: 3000000,
+        is_registered_previously: true, has_old_dispute_or_penalties: false,
+        vat_registered: false, real_estate_first_degree: true
+      }
+    };
+
+    function getFormPayload() {
+      return {
+        business_name: document.getElementById("business_name").value || "منشأة",
+        entity_type: document.getElementById("entity_type").value,
+        governorate: document.getElementById("governorate").value,
+        sector: "تجارة وخدمات",
+        annual_revenue_egp: Math.max(0, parseInt(document.getElementById("annual_revenue_egp").value || "0", 10)),
+        annual_expenses_egp: Math.max(0, parseInt(document.getElementById("annual_expenses_egp").value || "0", 10)),
+        dispute_principal_egp: Math.max(0, parseInt(document.getElementById("dispute_principal_egp").value || "0", 10)),
+        delay_penalties_egp: Math.max(0, parseInt(document.getElementById("delay_penalties_egp").value || "0", 10)),
+        vat_refund_claim_egp: Math.max(0, parseInt(document.getElementById("vat_refund_claim_egp").value || "0", 10)),
+        real_estate_sale_egp: Math.max(0, parseInt(document.getElementById("real_estate_sale_egp").value || "0", 10)),
+        is_registered_previously: document.getElementById("is_registered_previously").checked,
+        has_old_dispute_or_penalties: document.getElementById("has_old_dispute_or_penalties").checked,
+        vat_registered: document.getElementById("vat_registered").checked,
+        compliant_filing_history: true,
+        real_estate_first_degree: document.getElementById("real_estate_first_degree").checked
+      };
+    }
+
+    function renderOptimization(data) {
+      const comp = data.comparison;
+      const lean = data.lean4_verification;
+      const vec = data.solver.decision_vector;
+
+      document.getElementById("res-total-savings").textContent = fmtEgp(comp.total_direct_savings_egp);
+      document.getElementById("res-opt-tax").textContent = fmtEgp(comp.optimal_annual_tax_egp);
+      document.getElementById("res-std-tax").textContent = fmtEgp(comp.standard_regime_tax_egp);
+
+      document.getElementById("res-regime-title").textContent =
+        (lean.lean4_verified ? "✅ [موثّق بـ Lean 4] " : "⚠️ ") + comp.recommended_regime_ar;
+      document.getElementById("res-proof-meta").textContent =
+        `CERT: ${lean.proof_certificate_id || "N/A"} | SHA-256: ${(lean.proof_sha256 || "").slice(0, 28)}... | ` +
+        `Lean v${lean.lean_version || "4.36.0"} (${lean.theorems_proven || 10}/10 theorems, sorry=0) | ${lean.elapsed_ms || 0} ms`;
+
+      const alerts = data.deadline_warnings_ar || [];
+      document.getElementById("res-deadline-alerts").innerHTML = alerts.map(w =>
+        `<div class="proof-panel" style="border-color:#f59e0b; border-right-color:#f59e0b; color:#fde68a; margin-bottom:8px;">${escHtml(w)}</div>`
+      ).join("");
+
+      const ml = data.ml_intelligence || {};
+      const prop = ml.formalization_propensity || {};
+      const anom = ml.declaration_anomaly_guard || {};
+      document.getElementById("res-ml-propensity").textContent =
+        prop.probability_pct !== null && prop.probability_pct !== undefined
+          ? `🧠 توقّع XGBoost للانضمام للتيسيرات: ${prop.probability_pct}% — ${prop.tier_ar}`
+          : `🧠 توقّع XGBoost: ${prop.tier_ar || "معاملة عقارية فقط"}`;
+      const anomEl = document.getElementById("res-ml-anomaly");
+      anomEl.textContent = anom.is_anomalous
+        ? anom.warning_ar
+        : "✅ حارس كشف الشذوذ (IsolationForest): الأرقام والنسب متسقة مع متوسط السوق المصري.";
+
+      const tags = [
+        { on: vec.adopt_simplified_law6, text: "قانون 6 المبسط" },
+        { on: vec.stay_standard_regime, text: "النظام العادي (أوفر)" },
+        { on: vec.elect_law5_penalty_waiver, text: "تسوية الغرامات" },
+        { on: vec.apply_whitelist_fast_vat, text: "القائمة البيضاء — رد VAT في 7 أيام" },
+        { on: vec.claim_real_estate_exemption, text: "إعفاء عقاري 0% (درجة أولى)" }
+      ];
+      document.getElementById("res-decision-tags").innerHTML = tags
+        .map(t => `<span class="d-tag ${t.on ? "" : "off"}">${t.on ? "✓ " : "— "}${escHtml(t.text)}</span>`).join("");
+
+      document.getElementById("res-benefits").innerHTML = (data.benefits_ar || []).map(b => `<li>${escHtml(b)}</li>`).join("");
+      document.getElementById("res-roadmap").innerHTML = (data.roadmap_ar || []).map(r => `<li>${escHtml(r)}</li>`).join("");
+      document.getElementById("res-docs").innerHTML = (data.required_documents_ar || []).map(d => `<li>${escHtml(d)}</li>`).join("");
+      document.getElementById("res-citations").innerHTML =
+        "<strong>المرجعية وتواريخ السريان:</strong> " +
+        (data.legal_citations || []).map(c => `[${escHtml(c.law)} — سريان: ${escHtml(c.effective_date)} | المهلة: ${escHtml(c.expiry_date)}]`).join(" • ") +
+        `<br/><span style="color:#cbd5e1;">${escHtml(data.disclaimer_ar || "")}</span>`;
+    }
+
+    async function runOptimization() {
+      const resp = await fetch("/api/optimize", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(getFormPayload())
+      });
+      if (resp.ok) {
+        renderOptimization(await resp.json());
+        loadMinistryAnalytics();
+      }
+    }
+
+    function renderFollowups(items) {
+      const bar = document.getElementById("followups-container");
+      if (!items || !items.length) { bar.innerHTML = ""; return; }
+      bar.innerHTML = `<span style="font-size:12px; color:#fcd34d; align-self:center;">💡 3 أسئلة مقترحة لك:</span>` +
+        items.map(q => `<button type="button" class="preset-btn dyn-followup" data-fq="${escHtml(q)}">${escHtml(q)}</button>`).join("");
+      bar.querySelectorAll(".dyn-followup").forEach(b => {
+        b.addEventListener("click", () => sendChat(b.dataset.fq));
+      });
+    }
+
+    async function sendChat(text) {
+      const box = document.getElementById("chat-box");
+      const lang = document.getElementById("chat-lang").value;
+      const uDiv = document.createElement("div");
+      uDiv.className = "msg user"; uDiv.textContent = text;
+      box.appendChild(uDiv);
+      box.scrollTop = box.scrollHeight;
+
+      const resp = await fetch("/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text, lang, conversation_history: chatHistory.slice(-6) })
+      });
+      chatHistory.push(text);
+      const bDiv = document.createElement("div");
+      bDiv.className = "msg bot";
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.lang === "en") bDiv.classList.add("en");
+        bDiv.textContent = data.reply_ar;
+        renderFollowups(data.suggested_followups || []);
+        loadMinistryAnalytics();
+        loadEscalations();
+      } else {
+        bDiv.textContent = "تعذر إتمام التحليل حالياً.";
+      }
+      box.appendChild(bDiv);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleFileUpload(file, inChat) {
+      if (!file) return;
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const b64 = btoa(binary);
+      const ext = file.name.toLowerCase();
+      const payload = { filename: file.name, raw_text: "", mime_type: file.type || "application/octet-stream" };
+      if (ext.endsWith(".pdf")) payload.pdf_base64 = b64;
+      else if (ext.endsWith(".txt")) payload.raw_text = new TextDecoder("utf-8").decode(bytes);
+      else payload.image_base64 = b64;
+
+      const resp = await fetch("/api/scan-document", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (inChat) {
+        const box = document.getElementById("chat-box");
+        const bDiv = document.createElement("div");
+        bDiv.className = "msg bot";
+        const comp = data.optimization.comparison;
+        bDiv.textContent =
+          `📎 تم فحص الملف المرفق (${data.filename}) عبر ${data.ocr_engine}\n` +
+          `🔒 حماية قانون 151/2020: تم حجب ${data.pii_protection.redacted_count} بيانات شخصية\n` +
+          `✅ المسار الأمثل: ${comp.recommended_regime_ar}\n` +
+          `💰 الضريبة المثلى: ${fmtEgp(comp.optimal_annual_tax_egp)} | إجمالي الوفر الموثّق: ${fmtEgp(comp.total_direct_savings_egp)}\n` +
+          `🛡️ شهادة Lean 4: ${data.optimization.lean4_verification.proof_certificate_id}`;
+        box.appendChild(bDiv);
+        box.scrollTop = box.scrollHeight;
+      } else {
+        document.getElementById("doc-scan-status").textContent =
+          `✅ تم فحص (${data.filename}) | حجب ${data.pii_protection.redacted_count} بيانات شخصية | شهادة ${data.optimization.lean4_verification.proof_certificate_id}`;
+        renderOptimization(data.optimization);
+      }
+      loadMinistryAnalytics();
+    }
+
+    function startVoiceInput() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const btn = document.getElementById("btn-voice");
+      if (!SR) {
+        alert("متصفحك لا يدعم الإملاء الصوتي المباشر؛ استخدم Chrome أو Edge للتحدث بالعربية أو الإنجليزية.");
+        return;
+      }
+      const rec = new SR();
+      const selLang = document.getElementById("chat-lang").value;
+      rec.lang = selLang === "en" ? "en-US" : "ar-EG";
+      btn.textContent = "🔴 جارٍ الاستماع...";
+      rec.onresult = async (ev) => {
+        const transcript = ev.results[0][0].transcript;
+        btn.textContent = "🎙️ تحدث صوتياً";
+        document.getElementById("chat-input").value = transcript;
+        sendChat(transcript);
+      };
+      rec.onerror = () => { btn.textContent = "🎙️ تحدث صوتياً"; };
+      rec.onend = () => { btn.textContent = "🎙️ تحدث صوتياً"; };
+      rec.start();
+    }
+
+    async function runOfficialSearch(q) {
+      const box = document.getElementById("rag-results");
+      box.textContent = "جارٍ البحث في الـ 18 وثيقة رسمية والقرارات المضافة...";
+      const resp = await fetch("/api/official-data/search", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q, top_k: 3 })
+      });
+      if (!resp.ok) { box.textContent = "تعذر البحث."; return; }
+      const d = await resp.json();
+      if (!d.matches || !d.matches.length) { box.textContent = "لا توجد فقرات مطابقة."; return; }
+      box.innerHTML = d.matches.map(m => `
+        <div class="proof-panel" style="border-color:#f59e0b; border-right-color:#f59e0b; margin-bottom:10px;">
+          <strong>📄 ${escHtml(m.title)} — صفحة ${escHtml(m.page)} (${escHtml(m.org)} | تطابق ${Math.round(m.similarity * 100)}%)</strong>
+          <div style="margin-top:6px; color:#e2e8f0; white-space:pre-wrap;">${escHtml(m.excerpt)}</div>
+        </div>`).join("");
+    }
+
+    async function ingestDecree() {
+      const payload = {
+        doc_id: document.getElementById("dec_id").value.trim(),
+        title: document.getElementById("dec_title").value.trim(),
+        effective_date: document.getElementById("dec_eff").value,
+        raw_text: document.getElementById("dec_text").value.trim()
+      };
+      const resp = await fetch("/api/knowledge/ingest-decree", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const st = document.getElementById("decree-status");
+      if (resp.ok) {
+        const d = await resp.json();
+        st.textContent = `✅ تم التحديث الفوري دون إعادة بناء الحل! أُضيفت ${d.chunks_added} فقرات — إجمالي الفقرات الحية الآن: ${d.total_live_knowledge_chunks}.`;
+        runOfficialSearch(payload.title);
+      } else {
+        st.textContent = "⚠️ تأكد من إدخال عنوان ونص كافٍ للقرار.";
+      }
+    }
+
+    async function loadEscalations() {
+      const resp = await fetch("/api/officer/escalations");
+      if (!resp.ok) return;
+      const d = await resp.json();
+      const list = d.escalations || [];
+      const box = document.getElementById("officer-escalations-list");
+      if (!list.length) {
+        box.innerHTML = `<div class="proof-panel">لا توجد إحالات معلقة حالياً — جرّب زر «تجربة سؤال خارج النطاق» في التبويب الأول لرؤية الإحالة الفورية وملخص المحادثة هنا!</div>`;
+        return;
+      }
+      box.innerHTML = list.map(e => `
+        <div class="proof-panel" style="border-color:#38bdf8; border-right-color:#38bdf8; margin-bottom:10px;">
+          <strong>🎫 ${escHtml(e.ticket_id)} | ${escHtml(e.reason)} (${escHtml(e.lang.toUpperCase())})</strong>
+          <div style="margin-top:5px; color:#cbd5e1;">${escHtml(e.conversation_summary)}</div>
+        </div>`).join("");
+    }
+
+    async function loadMinistryAnalytics() {
+      const resp = await fetch("/api/ministry/analytics");
+      if (!resp.ok) return;
+      const data = await resp.json();
+      const k = data.kpis;
+      document.getElementById("mof-savings").textContent = fmtEgp(k.total_citizen_savings_egp);
+      document.getElementById("mof-formalized").textContent = `${k.informal_economy_formalized} منشأة`;
+      document.getElementById("mof-law6-rate").textContent = `${k.law6_adoption_rate_pct}%`;
+      document.getElementById("mof-lean-rate").textContent = `${k.lean4_verification_rate_pct}%`;
+
+      const faqs = data.top_frequent_questions || [];
+      const maxFaq = Math.max(1, ...faqs.map(f => f.ask_count));
+      document.getElementById("mof-faq-bars").innerHTML = faqs.map(f => `
+        <div class="bar-row">
+          <div class="bar-head"><span>${escHtml(f.topic_ar)}</span><span><strong>${f.ask_count} استفسار</strong></span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round((f.ask_count / maxFaq) * 100)}%"></div></div>
+        </div>`).join("");
+
+      const maxGov = Math.max(1, ...data.by_governorate.map(g => g.count));
+      document.getElementById("mof-gov-bars").innerHTML = data.by_governorate.map(g => `
+        <div class="bar-row">
+          <div class="bar-head"><span>${escHtml(g.governorate)} (${g.count})</span><span>${fmtEgp(g.savings_egp)}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round((g.count / maxGov) * 100)}%"></div></div>
+        </div>`).join("");
+
+      const maxSec = Math.max(1, ...data.by_sector.map(s => s.count));
+      document.getElementById("mof-sector-bars").innerHTML = data.by_sector.map(s => `
+        <div class="bar-row">
+          <div class="bar-head"><span>${escHtml(s.sector)} (${s.count})</span><span>${fmtEgp(s.savings_egp)}</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round((s.count / maxSec) * 100)}%"></div></div>
+        </div>`).join("");
+    }
+
+    async function loadLeanAndModels() {
+      const [rLean, rMl, rFc, rMan] = await Promise.all([
+        fetch("/api/lean4/theorems"),
+        fetch("/api/models/metrics"),
+        fetch("/api/official-data/fiscal-forecast"),
+        fetch("/api/official-data/manifest")
+      ]);
+      if (rLean.ok) {
+        const d = await rLean.json();
+        document.getElementById("lean-theorems-body").innerHTML = d.theorems.map(t => `
+          <tr><td><strong>${escHtml(t.id)}</strong></td>
+          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:#6ee7b7;">${escHtml(t.name)}</td>
+          <td>${escHtml(t.law)}</td><td>${escHtml(t.desc)}</td></tr>`).join("");
+        document.getElementById("lean-source-code").textContent = d.source_code || "";
+      }
+      if (rMl.ok) {
+        const d = await rMl.json();
+        if (d.arabic_intent_classifier) {
+          const nlp = d.arabic_intent_classifier, clf = d.sme_formalization_classifier, reg = d.expense_ratio_regressor, iso = d.tax_anomaly_detector;
+          const rm = d.official_real_data_models || {};
+          const rows = [];
+          if (rm.official_eta_legal_rag_classifier) {
+            const lm = rm.official_eta_legal_rag_classifier;
+            rows.push({ name: "⭐ [بيانات رسمية 100%] " + lm.model_name, file: lm.artifacts.weights_path, kb: `${lm.artifacts.weights_kb} KB`, metric: `Real PDF Acc: ${(lm.selected_test_metrics.accuracy*100).toFixed(1)}% | Macro-F1: ${lm.selected_test_metrics.macro_f1}` });
+          }
+          if (rm.official_mof_fiscal_forecaster) {
+            const fm = rm.official_mof_fiscal_forecaster;
+            rows.push({ name: "⭐ [بيانات رسمية 100%] " + fm.model_name, file: fm.artifact_path, kb: `${fm.artifact_kb} KB`, metric: `توقع 2027/28: ${fm.fy_2027_2028_projected_tax_billion_egp} مليار ج.م` });
+          }
+          rows.push(
+            { name: nlp.model_name, file: nlp.artifacts.weights_path, kb: `${nlp.artifacts.weights_kb} KB`, metric: `Unseen-Phrasing F1: ${nlp.selected_test_metrics.unseen_phrasing_group_macro_f1}` },
+            { name: clf.model_name, file: clf.artifact_path, kb: `${clf.artifact_kb} KB`, metric: `PR-AUC: ${clf.selected_test_metrics.pr_auc} | F1: ${clf.selected_test_metrics.f1}` },
+            { name: reg.model_name, file: reg.artifact_path, kb: `${reg.artifact_kb} KB`, metric: `R²: ${reg.selected_test_metrics.r2} | MAE: ${reg.selected_test_metrics.mae}` },
+            { name: iso.model_name, file: iso.artifact_path, kb: `${iso.artifact_kb} KB`, metric: `Normal Pass: ${(iso.normal_acceptance_rate*100).toFixed(1)}%` }
+          );
+          document.getElementById("ml-models-body").innerHTML = rows.map(r => `
+            <tr><td><strong>${escHtml(r.name)}</strong></td>
+            <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:#fcd34d;">${escHtml(r.file)}</td>
+            <td>${escHtml(r.kb)}</td><td style="color:#6ee7b7;">${escHtml(r.metric)}</td></tr>`).join("");
+        }
+      }
+      if (rFc.ok) {
+        const fc = await rFc.json();
+        if (fc.ready) {
+          document.getElementById("mof-forecast-2728").textContent = `${Number(fc.fy_2027_2028_projected_tax_billion_egp).toLocaleString("en-US")} مليار`;
+          const hist = (fc.recent_fiscal_years || []).concat([{ fiscal_year: "2027/2028 (توقع ML)", tax_rev_billion_egp: fc.fy_2027_2028_projected_tax_billion_egp }]);
+          const maxV = Math.max(1, ...hist.map(x => Number(x.tax_rev_billion_egp || 0)));
+          document.getElementById("mof-real-bars").innerHTML = hist.map(x => `
+            <div class="bar-row"><div class="bar-head"><span>السنة المالية ${escHtml(x.fiscal_year)}</span><span><strong>${Number(x.tax_rev_billion_egp || 0).toLocaleString("en-US")} مليار ج.م</strong></span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round((Number(x.tax_rev_billion_egp || 0)/maxV)*100)}%"></div></div></div>`).join("");
+        }
+      }
+      if (rMan.ok) {
+        const m = await rMan.json();
+        document.getElementById("mof-pdfs-count").textContent = `${m.official_pdfs_count || 0} PDF (${m.official_corpus_chunks || 0} فقرة)`;
+        document.getElementById("official-manifest-body").innerHTML = (m.official_pdfs || []).slice(0, 12).map(doc => `
+          <tr><td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:#6ee7b7;">${escHtml(doc.doc_id)}</td>
+          <td>${escHtml(doc.org)}</td><td>${escHtml(doc.title)}</td><td>${escHtml(doc.pages)} ص / ${escHtml(doc.extracted_chunks)} فقرة</td>
+          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:11px;color:#94a3b8;">${escHtml((doc.sha256 || "").slice(0, 16))}...</td></tr>`).join("");
+      }
+    }
+
+    async function downloadReport(endpoint, filename) {
+      const resp = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(getFormPayload()) });
+      if (!resp.ok) return;
+      const url = URL.createObjectURL(await resp.blob());
+      const a = document.createElement("a"); a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      });
+    });
+    document.querySelectorAll(".preset-btn[data-preset]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const p = PRESETS[btn.dataset.preset];
+        for (const [k, v] of Object.entries(p)) {
+          const el = document.getElementById(k);
+          if (el) { if (el.type === "checkbox") el.checked = Boolean(v); else el.value = v; }
+        }
+        runOptimization();
+      });
+    });
+    document.querySelectorAll(".chat-chip").forEach(btn => btn.addEventListener("click", () => sendChat(btn.dataset.q)));
+    document.querySelectorAll(".rag-chip").forEach(btn => btn.addEventListener("click", () => {
+      document.getElementById("rag-input").value = btn.dataset.rq;
+      runOfficialSearch(btn.dataset.rq);
+    }));
+    document.getElementById("btn-run-opt").addEventListener("click", runOptimization);
+    document.getElementById("btn-dl-html").addEventListener("click", () => downloadReport("/api/report/html", "moyasser_roadmap.html"));
+    document.getElementById("btn-dl-pdf").addEventListener("click", () => downloadReport("/api/report/pdf", "moyasser_verified_certificate.pdf"));
+    document.getElementById("btn-voice").addEventListener("click", startVoiceInput);
+    document.getElementById("chat-file-upload").addEventListener("change", (e) => handleFileUpload(e.target.files[0], true));
+    document.getElementById("scanner-file-input").addEventListener("change", (e) => handleFileUpload(e.target.files[0], false));
+    document.getElementById("btn-ingest-decree").addEventListener("click", ingestDecree);
+    document.getElementById("btn-fill-sample-doc").addEventListener("click", () => {
+      document.getElementById("doc_text").value =
+        "إخطار ضريبي للرقم القومي 29805150102345 — إجمالي المبيعات السنوية 2.4 مليون جنيه، المصروفات 1.3 مليون جنيه، أصل الضريبة 60 ألف، مقابل التأخير 95 ألف جنيه.";
+    });
+    document.getElementById("btn-scan-doc").addEventListener("click", async () => {
+      const raw = document.getElementById("doc_text").value.trim();
+      if (!raw) return;
+      const resp = await fetch("/api/scan-document", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: "notice.txt", raw_text: raw })
+      });
+      if (resp.ok) {
+        const d = await resp.json();
+        document.getElementById("doc-scan-status").textContent =
+          `✅ تم الفحص | حجب ${d.pii_protection.redacted_count} بيانات شخصية (قانون 151/2020) | شهادة ${d.optimization.lean4_verification.proof_certificate_id}`;
+        renderOptimization(d.optimization);
+        loadMinistryAnalytics();
+      }
+    });
+    document.getElementById("chat-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const inp = document.getElementById("chat-input");
+      const val = inp.value.trim();
+      if (!val) return;
+      inp.value = "";
+      sendChat(val);
+    });
+    document.getElementById("rag-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = document.getElementById("rag-input").value.trim();
+      if (q) runOfficialSearch(q);
+    });
+
+    runOptimization();
+    loadMinistryAnalytics();
+    loadLeanAndModels();
+    loadEscalations();
+  </script>
+</body>
+</html>

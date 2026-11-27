@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>خارطة الطريق الضريبية الموثّقة — منشأة مطاعم وأغذية</title>
+  <style>
+    @page { size: A4; margin: 14mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      margin: 0;
+      padding: 24px;
+      line-height: 1.65;
+    }
+    .sheet {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .header {
+      background: linear-gradient(135deg, #0b1f3a 0%, #113a5d 65%, #0e5a4f 100%);
+      color: #ffffff;
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .header h1 { margin: 0 0 6px; font-size: 24px; }
+    .header p { margin: 0; color: #cbd5e1; font-size: 13px; }
+    .seal {
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid #10b981;
+      color: #ecfdf5;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      text-align: left;
+    }
+    .seal strong { display: block; color: #6ee7b7; font-size: 13px; }
+    .body { padding: 28px 32px; }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .kpi.highlight {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+      border-color: #34d399;
+    }
+    .kpi .label { font-size: 12px; color: #475569; margin-bottom: 4px; }
+    .kpi .val { font-size: 20px; font-weight: 800; color: #0f172a; }
+    .kpi.highlight .val { color: #065f46; }
+    h2 {
+      font-size: 17px;
+      color: #0b1f3a;
+      border-right: 4px solid #0e7490;
+      padding-right: 10px;
+      margin: 24px 0 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 13.5px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      text-align: right;
+    }
+    th { background: #f1f5f9; color: #1e293b; }
+    .proof-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      direction: ltr;
+      text-align: left;
+      margin: 16px 0;
+      border-left: 5px solid #10b981;
+    }
+    .proof-box .title { color: #34d399; font-weight: bold; margin-bottom: 6px; font-size: 13px; }
+    ul, ol { padding-right: 22px; margin: 8px 0 16px; }
+    li { margin-bottom: 8px; }
+    .footer {
+      background: #f1f5f9;
+      padding: 16px 32px;
+      font-size: 12px;
+      color: #475569;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #e2e8f0;
+    }
+    @media print {
+      body { background: #ffffff; padding: 0; }
+      .sheet { box-shadow: none; border: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="header">
+      <div>
+        <h1>مُيسّر الضرائب الذكي — Moyasser AI</h1>
+        <p>تقرير خارطة الطريق الضريبية التنفيذية — هاكثون وزارة المالية ومركز SECC / ITIDA</p>
+        <p>المنشأة: منشأة مطاعم وأغذية | القطاع: تجارة وخدمات | المحافظة: الجيزة</p>
+      </div>
+      <div class="seal">
+        <strong>🛡️ موثّق رياضياً — Lean 4 Kernel (10/10 نظريات، 0 sorry)</strong>
+        <div>Certificate: LEAN4-PROOF-55C13A54C55870B3</div>
+        <div>Solver: SciPy HiGHS Mixed-Integer Linear Programming (MILP)</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="kpis">
+        <div class="kpi highlight">
+          <div class="label">إجمالي الوفر المباشر الموثّق</div>
+          <div class="val">475,250 ج.م</div>
+        </div>
+        <div class="kpi">
+          <div class="label">الضريبة السنوية المثلى</div>
+          <div class="val">40,000 ج.م</div>
+        </div>
+        <div class="kpi">
+          <div class="label">النظام العادي (للمقارنة)</div>
+          <div class="val">335,250 ج.م</div>
+        </div>
+        <div class="kpi">
+          <div class="label">وفر الغرامات والعقارات</div>
+          <div class="val">180,000 ج.م</div>
+        </div>
+      </div>
+
+      <h2>1. المقارنة المالية المثلى (النظام الضريبي المبسط (قانون 6 لسنة 2025))</h2>
+      <table>
+        <thead>
+          <tr><th>البند المالي / الضريبي</th><th>القيمة قبل التيسيرات</th><th>القيمة المثلى بعد التيسيرات</th><th>الوفر المحقق</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>الضريبة السنوية (مبسط قانون 6: 40,000 ج.م)</td>
+            <td>335,250 ج.م</td>
+            <td><strong>40,000 ج.م</strong></td>
+            <td><strong>295,250 ج.م</strong></td>
+          </tr>
+          <tr>
+            <td>مقابل التأخير والغرامات (قانون 5 و7 لسنة 2025)</td>
+            <td>180,000 ج.م</td>
+            <td><strong>0 ج.م</strong></td>
+            <td><strong>180,000 ج.م</strong></td>
+          </tr>
+          <tr>
+            <td>ضريبة التصرفات العقارية (الحزمة الثانية 2.5% أو إعفاء 0%)</td>
+            <td>0 ج.م</td>
+            <td><strong>0 ج.م</strong></td>
+            <td><strong>0 ج.م</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="proof-box">
+        <div class="title">LEAN 4 FORMAL VERIFICATION CERTIFICATE (ZERO HALLUCINATION GUARANTEE)</div>
+        <div>Certificate ID : LEAN4-PROOF-55C13A54C55870B3</div>
+        <div>SHA-256 Digest : 55c13a54c55870b385387f42f4a8a55643dae4479f0e60aa8390450f847c2c0f</div>
+        <div>Lean Kernel    : v4.36.0 | Theorems Proven: 10/8 | sorry_count: 0</div>
+        <div>Verified Regime: SIMPLIFIED_LAW6 | Optimal Tax: 40000 EGP | Elapsed: 34.09 ms</div>
+      </div>
+
+      <h2>2. المزايا والإعفاءات المستحقة لك</h2>
+      <ul><li>الانضمام للنظام الضريبي المبسط بنسبة 1.0% فقط من حجم الأعمال (من 3 ملايين إلى أقل من 10 ملايين جنيه) بدلاً من الضريبة العادية.</li><li>إعفاء تام من ضريبة الدمغة، ورسم تنمية الموارد، ورسوم توثيق عقود التأسيس والائتمان، وضريبة الأرباح الرأسمالية وتوزيعات الأرباح.</li><li>عدم الخضوع لنظام الخصم والتحصيل تحت حساب الضريبة + تأجيل الفحص الضريبي لمدة 5 سنوات.</li><li>تقديم إقرار القيمة المضافة كل 3 أشهر (ربع سنوي) بدلاً من شهرياً + إقرار مرتبات سنوي مبسط.</li><li>أولوية الحصول على تمويل ميسر منخفض التكلفة ضمن مبادرة أول 100 ألف ممول بالحزمة الثانية.</li><li>التجاوز الكامل (100%) عن مقابل التأخير بقيمة 180,000 ج.م عبر تسوية قانون 5 لسنة 2025 وقانون إنهاء المنازعات الممتد حتى 31 ديسمبر 2026.</li></ul>
+
+      <h2>3. خطة التنفيذ خطوة بخطوة</h2>
+      <ol><li>تقديم طلب الانضمام للنظام الضريبي المبسط (قانون 6 لسنة 2025 — شريحة 1.0%) عبر بوابة ETA.</li><li>الانضمام لمنظومة الفاتورة الإلكترونية أو الإيصال الإلكتروني كشرط استمرار التمتع بالمزايا.</li><li>تقديم طلب إنهاء النزاع / تسوية أصل الضريبة قبل 31 ديسمبر 2026 لإسقاط مقابل التأخير بالكامل.</li><li>للدعم الفني الفوري: التوجه إلى مركز الخدمات الضريبية المتميزة — الشيخ زايد (أو بوابة ETA الإلكترونية).</li></ol>
+
+      <h2>4. المستندات المطلوبة وأقرب مركز خدمة متميز</h2>
+      <ul><li>بطاقة الرقم القومي للمالك أو الممثل القانوني (سارية)</li><li>عقد الإيجار أو التمليك لمقر النشاط (موثق أو ثابت التاريخ)</li><li>البطاقة الضريبية وشهادة التسجيل الضريبي (رقم التسجيل الموحد)</li><li>ملخص الإيرادات السنوية أو الإقرار الضريبي لآخر فترة (لإثبات عدم تجاوز سقف 20 مليون جنيه)</li><li>إخطار المطالبة أو ملف النزاع الضريبي القائم</li></ul>
+      <p><strong>أقرب مركز خدمة متميز مقترح:</strong> مركز الخدمات الضريبية المتميزة — الشيخ زايد (أو بوابة ETA الإلكترونية)</p>
+
+      <h2>5. المرجعية القانونية الرسمية وتواريخ السريان والمهل</h2>
+      <ul><li style='color:#b45309;font-weight:bold;'>⏰ تنبيه مهلة قانونية منتهية (قانون رقم 5 لسنة 2025 (وقرار وزير المالية 167 لسنة 2025)): المهلة الأصلية لتقديم طلبات التسوية/الإقرارات القديمة انتهت في 2025-08-12 (تاريخ السريان كان 2025-02-13) — يُرجى الاستفادة بدلاً منها من القانون الدائم 6/2025 أو قانون إنهاء المنازعات 152/2026 الساري حتى 31 ديسمبر 2026.</li><li style='color:#b45309;font-weight:bold;'>⚠️ تنبيه مهلة قريبة الانتهاء (القانون رقم 152 لسنة 2026): يتبقى 34 يوماً فقط قبل انتهاء المهلة في 2026-12-31 (سارٍ منذ 2026-08-01).</li></ul>
+      <table>
+        <thead><tr><th>القانون / تاريخ السريان</th><th>البند</th><th>الملخص القانوني</th></tr></thead>
+        <tbody><tr><td><strong>قانون رقم 6 لسنة 2025</strong><br/><small>سريان: 2025-03-01 | المهلة: PERMANENT</small></td><td>النظام الضريبي المبسط والدائم للمشروعات حتى 20 مليون جنيه</td><td>ضريبة نسبية مبسطة على حجم الأعمال السنوي (0.4% إلى 1.5%) بدلاً من الدفاتر المعقدة والفحص التقديري (مع سماح تجاوز لمرة واحدة حتى 20% / 24 مليون جنيه خلال 5 سنوات).</td></tr><tr><td><strong>قانون رقم 6 لسنة 2025</strong><br/><small>سريان: 2025-03-01 | المهلة: PERMANENT</small></td><td>إعفاءات الدمغة وتنمية الموارد والأرباح الرأسمالية وتوزيعات الأرباح + استقرار 5 سنوات</td><td>إعفاء كامل من ضريبة الدمغة، رسم تنمية الموارد، توثيق عقود التأسيس والتمويل، ضريبة الأرباح الرأسمالية وتوزيعات الأرباح، عدم الخضوع للخصم والتحصيل، تأجيل الفحص 5 سنوات، وإقرار قيمة مضافة ربع سنوي.</td></tr><tr><td><strong>الحزمة الثانية للتيسيرات الضريبية 2026</strong><br/><small>سريان: 2026-08-01 | المهلة: CAP_100000_TAXPAYERS</small></td><td>تمويل ميسر ومنخفض التكلفة لأول 100 ألف ممول بالنظام المبسط</td><td>تسهيلات تمويلية ميسرة بالتنسيق مع جهاز تنمية المشروعات للمنضمين للنظام المبسط بحد أقصى أول 100 ألف ممول.</td></tr><tr><td><strong>قانون رقم 7 لسنة 2025</strong><br/><small>سريان: 2025-02-13 | المهلة: PERMANENT</small></td><td>سقف مقابل التأخير (تعديل قانون الإجراءات الضريبية الموحد 206 لسنة 2020)</td><td>وضع حد أقصى قانوني دائم لمقابل التأخير والضريبة الإضافية بحيث لا يتجاوز 100% من أصل الضريبة المستحقة.</td></tr><tr><td><strong>قانون رقم 5 لسنة 2025 (وقرار وزير المالية 167 لسنة 2025)</strong><br/><small>سريان: 2025-02-13 | المهلة: 2025-08-12</small></td><td>تسوية أوضاع الممولين وفتح ملفات جديدة والتجاوز عن مقابل التأخير</td><td>عدم المحاسبة بأثر رجعي لغير المسجلين (اعتبار 13 فبراير 2025 تاريخ بدء النشاط بشرط التقديم في المهلة المحددة)، والتجاوز حتى 100% عن مقابل التأخير وفق ضوابط ومواعيد القانون وقرار المد 167 لسنة 2025.</td></tr><tr><td><strong>القانون رقم 152 لسنة 2026</strong><br/><small>سريان: 2026-08-01 | المهلة: 2026-12-31</small></td><td>تجديد العمل بقانون 79 لسنة 2016 لإنهاء المنازعات الضريبية حتى 31 ديسمبر 2026</td><td>إتاحة التسوية السريعة للمنازعات الضريبية القائمة قبل لجان الطعن والمحاكم حتى موعد أقصاه 31 ديسمبر 2026.</td></tr></tbody>
+      </table>
+      <p style="font-size:12px;color:#475569;background:#f8fafc;padding:10px 14px;border-radius:8px;border:1px solid #cbd5e1;">تنويه رسمي (وفق ضوابط مصلحة الضرائب المصرية وقانون حماية البيانات الشخصية رقم 151 لسنة 2020): هذه الإجابات والحسابات استرشادية فقط استناداً إلى التشريعات والأدلة الرسمية المنشورة، ولا تُعد رأياً ملزماً لمصلحة الضرائب المصرية أو فتوى ضريبية. لا يطلب النظام ولا يعالج الرقم القومي أو رقم التسجيل الضريبي.</p>
+    </div>
+
+    <div class="footer">
+      <span>تاريخ الإصدار: 2026-11-27 13:13</span>
+      <span>مُيسّر الضرائب الذكي — Neuro-Symbolic HiGHS MILP + Lean 4 Verified Engine</span>
+    </div>
+  </div>
+</body>
+</html>

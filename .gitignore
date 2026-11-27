@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+lean_kernel/.lake/
+data/*.db
+datasets/official_mof_eta/dynamic_decrees.jsonl
+.env

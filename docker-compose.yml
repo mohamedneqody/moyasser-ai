@@ -1,0 +1,9 @@
+services:
+  moyasser-ai:
+    build: .
+    container_name: moyasser-tax02
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped

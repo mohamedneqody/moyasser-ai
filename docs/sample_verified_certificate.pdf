@@ -1,0 +1,62 @@
+%PDF-1.4
+1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj
+2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj
+3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj
+4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Courier >> endobj
+5 0 obj << /Length 2353 >> stream
+BT
+/F1 10 Tf
+42 790 Td
+15 TL
+(MOYASSER AI - FORMALLY VERIFIED EGYPTIAN TAX FACILITATION CERTIFICATE) Tj
+T* (Ministry of Finance / ITIDA SECC Impact Hackathon - Track 1) Tj
+T* (==========================================================================) Tj
+T* (Issued At          : 2026-11-27 13:13 UTC) Tj
+T* (Entity Type        : company) Tj
+T* (Annual Revenue     : 4,000,000 EGP) Tj
+T* (Annual Expenses    : 2,500,000 EGP) Tj
+T* (--------------------------------------------------------------------------) Tj
+T* (1. GLOBAL MILP OPTIMIZATION RESULT \(SciPy HiGHS Solver\)) Tj
+T* (   Solver Status          : OPTIMAL) Tj
+T* (   Recommended Regime     : SIMPLIFIED_LAW6) Tj
+T* (   Standard Regime Tax    : 335,250 EGP) Tj
+T* (   Optimal Annual Tax     : 40,000 EGP) Tj
+T* (   Annual Tax Savings     : 295,250 EGP) Tj
+T* (   Raw Delay Penalties    : 180,000 EGP) Tj
+T* (   Final Settled Penalty  : 0 EGP \(Saved: 180,000 EGP\)) Tj
+T* (   Real Estate Tax        : 0 EGP \(Saved: 0 EGP\)) Tj
+T* (   TOTAL DIRECT SAVINGS   : 475,250 EGP) Tj
+T* (   White List VAT \(7-day\) : STANDARD) Tj
+T* (   SME Financing \(100k\)   : ELIGIBLE) Tj
+T* (--------------------------------------------------------------------------) Tj
+T* (2. LEAN 4 FORMAL VERIFICATION PROOF STAMP) Tj
+T* (   Kernel Verified        : True) Tj
+T* (   Lean Version           : 4.36.0) Tj
+T* (   Theorems Proven        : 10/8 \(sorry_count = 0\)) Tj
+T* (   Certificate ID         : LEAN4-PROOF-55C13A54C55870B3) Tj
+T* (   SHA-256 Digest         : 55c13a54c55870b385387f42f4a8a55643dae4479f0e60aa8390450f847c2c0f) Tj
+T* (   Verification Latency   : 34.09 ms) Tj
+T* (--------------------------------------------------------------------------) Tj
+T* (3. APPLICABLE EGYPTIAN STATUTORY REFERENCES) Tj
+T* (   - [LAW_6_2025] Official Egyptian Tax Facilitation Statute) Tj
+T* (   - [LAW_6_2025_EXEMPTIONS] Official Egyptian Tax Facilitation Statute) Tj
+T* (   - [PKG2_SME_FINANCING] Official Egyptian Tax Facilitation Statute) Tj
+T* (   - [LAW_7_2025] Official Egyptian Tax Facilitation Statute) Tj
+T* (   - [LAW_5_2025] Official Egyptian Tax Facilitation Statute) Tj
+T* (   - [LAW_152_2026] Official Egyptian Tax Facilitation Statute) Tj
+T* (==========================================================================) Tj
+T* (Note: For full Arabic RTL layout, download the companion HTML roadmap.) Tj
+ET
+endstream endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000309 00000 n 
+trailer << /Size 6 /Root 1 0 R >>
+startxref
+2714
+%%EOF

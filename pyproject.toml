@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moyasser-ai"
+version = "1.0.0"
+description = "Moyasser AI — Neuro-Symbolic Formally Verified Egyptian Tax Facilitation & Optimization Copilot (Lean 4 + HiGHS MILP + Gemini AI + CyberGuard Verified)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn>=0.29.0",
+    "scipy>=1.11.0",
+    "pydantic>=2.5.0",
+    "httpx>=0.27.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["moyasser*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

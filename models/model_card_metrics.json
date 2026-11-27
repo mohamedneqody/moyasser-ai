@@ -1,0 +1,350 @@
+{
+  "pipeline_version": "1.0.0",
+  "frameworks": {
+    "pytorch": "2.13.0+cpu",
+    "xgboost": "3.4.0",
+    "scikit_learn": "1.9.0"
+  },
+  "arabic_intent_classifier": {
+    "model_name": "PyTorch Residual MLP (ArabicTaxIntentNet)",
+    "artifacts": {
+      "weights_path": "models/arabic_intent_mlp.pt",
+      "weights_kb": 1891.3,
+      "vectorizer_path": "models/arabic_tfidf_vectorizer.joblib",
+      "vectorizer_kb": 30.4
+    },
+    "dataset_rows": 2011,
+    "splits": {
+      "train": 1352,
+      "val": 297,
+      "test": 362
+    },
+    "train_seconds": 10.11,
+    "inference_ms_per_query": 0.016,
+    "selected_test_metrics": {
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "macro_f1_95ci": [
+        1.0,
+        1.0
+      ],
+      "unseen_phrasing_group_macro_f1": 0.9515,
+      "best_val_loss": 0.2409
+    },
+    "model_comparison_test_macro_f1": {
+      "DummyClassifier (Majority Baseline)": 0.0494,
+      "MultinomialNB": 1.0,
+      "LogisticRegression (L2)": 1.0,
+      "PyTorch ArabicTaxIntentNet (Selected)": 1.0
+    },
+    "confusion_matrix": [
+      [
+        63,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        62,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        58,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        59,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        60,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        60
+      ]
+    ],
+    "classes": [
+      "LAW6_SIMPLIFIED_SME",
+      "LAW5_DISPUTE_WAIVER",
+      "INFORMAL_REGULARIZATION",
+      "PKG2_REAL_ESTATE_TAX",
+      "PKG2_WHITELIST_VAT",
+      "THIN_MARGIN_STANDARD_COMPARE"
+    ]
+  },
+  "sme_formalization_classifier": {
+    "model_name": "XGBoost Classifier (xgboost 3.4.0)",
+    "artifact_path": "models/sme_formalization_xgb.joblib",
+    "artifact_kb": 92.3,
+    "dataset_rows": 6000,
+    "missing_values_imputed": {
+      "years_operating_missing_pct": 3.83
+    },
+    "train_seconds": 1.79,
+    "cv5_roc_auc": 0.7262,
+    "test_roc_auc_95ci": [
+      0.6887,
+      0.7741
+    ],
+    "selected_test_metrics": {
+      "roc_auc": 0.7301,
+      "pr_auc": 0.9371,
+      "f1": 0.9328,
+      "brier": 0.1046
+    },
+    "model_comparison_test": {
+      "DummyClassifier (Baseline)": {
+        "roc_auc": 0.5,
+        "pr_auc": 0.8592,
+        "f1": 0.9242,
+        "brier": 0.1408
+      },
+      "LogisticRegression": {
+        "roc_auc": 0.7406,
+        "pr_auc": 0.938,
+        "f1": 0.9336,
+        "brier": 0.1019
+      },
+      "RandomForestClassifier": {
+        "roc_auc": 0.7374,
+        "pr_auc": 0.9359,
+        "f1": 0.9321,
+        "brier": 0.1025
+      },
+      "XGBClassifier (Selected)": {
+        "roc_auc": 0.7301,
+        "pr_auc": 0.9371,
+        "f1": 0.9328,
+        "brier": 0.1046
+      }
+    },
+    "confusion_matrix": [
+      [
+        32,
+        137
+      ],
+      [
+        10,
+        1021
+      ]
+    ],
+    "slice_roc_auc_by_governorate": {
+      "الجيزة": 0.8096,
+      "القاهرة": 0.7281,
+      "الإسكندرية": 0.734,
+      "الدلتا": 0.7785,
+      "مطروح": 0.5141,
+      "الصعيد": 0.695
+    },
+    "top_features": [
+      {
+        "feature": "num__savings_ratio",
+        "importance": 0.1093
+      },
+      {
+        "feature": "num__has_old_dispute",
+        "importance": 0.055
+      },
+      {
+        "feature": "cat__governorate_الإسكندرية",
+        "importance": 0.054
+      },
+      {
+        "feature": "num__annual_revenue_egp",
+        "importance": 0.0473
+      },
+      {
+        "feature": "num__penalty_to_revenue_ratio",
+        "importance": 0.0421
+      },
+      {
+        "feature": "cat__governorate_القاهرة",
+        "importance": 0.0417
+      },
+      {
+        "feature": "num__is_registered_previously",
+        "importance": 0.0415
+      },
+      {
+        "feature": "cat__sector_نقل ولوجستيات",
+        "importance": 0.0393
+      }
+    ]
+  },
+  "expense_ratio_regressor": {
+    "model_name": "XGBoost Regressor (Sector Expense Estimator)",
+    "artifact_path": "models/expense_estimator_xgb.joblib",
+    "artifact_kb": 60.7,
+    "selected_test_metrics": {
+      "mae": 0.0662,
+      "rmse": 0.0834,
+      "r2": 0.8391
+    },
+    "model_comparison_test": {
+      "DummyRegressor (Mean Baseline)": {
+        "mae": 0.1787,
+        "rmse": 0.208,
+        "r2": -0.0001
+      },
+      "Ridge Regression": {
+        "mae": 0.0655,
+        "rmse": 0.0825,
+        "r2": 0.8428
+      },
+      "RandomForestRegressor": {
+        "mae": 0.0663,
+        "rmse": 0.0839,
+        "r2": 0.8372
+      },
+      "XGBRegressor (Selected)": {
+        "mae": 0.0662,
+        "rmse": 0.0834,
+        "r2": 0.8391
+      }
+    }
+  },
+  "tax_anomaly_detector": {
+    "model_name": "IsolationForest Declaration Guard",
+    "artifact_path": "models/tax_anomaly_iforest.joblib",
+    "artifact_kb": 628.5,
+    "normal_acceptance_rate": 0.98,
+    "synthetic_clerical_outlier_catch_rate": 0.75
+  },
+  "official_real_data_models": {
+    "official_eta_legal_rag_classifier": {
+      "data_provenance": "100% REAL OFFICIAL DATA (eta.gov.eg & media.mof.gov.eg PDFs)",
+      "model_name": "PyTorch Official Legal Classifier + Semantic RAG (official_eta_legal_net.pt)",
+      "artifacts": {
+        "weights_path": "models/official_eta_legal_net.pt",
+        "weights_kb": 1539.9,
+        "rag_index_path": "models/official_eta_rag_index.joblib",
+        "rag_index_kb": 1131.2
+      },
+      "official_corpus_chunks": 437,
+      "official_documents_indexed": 13,
+      "splits": {
+        "train": 340,
+        "test": 97
+      },
+      "train_seconds": 2.93,
+      "classes": [
+        "ETA_REAL_ESTATE_FAQ_2026",
+        "MOF_MONTHLY_FISCAL_OCT2026",
+        "PKG1_LAWS_5_6_7_2025",
+        "PKG2_LAWS_148_153_2026"
+      ],
+      "class_distribution": {
+        "MOF_MONTHLY_FISCAL_OCT2026": 202,
+        "ETA_REAL_ESTATE_FAQ_2026": 125,
+        "PKG2_LAWS_148_153_2026": 69,
+        "PKG1_LAWS_5_6_7_2025": 41
+      },
+      "selected_test_metrics": {
+        "accuracy": 0.9278,
+        "macro_f1": 0.8659
+      },
+      "model_comparison_test_macro_f1": {
+        "DummyClassifier (Majority Baseline)": 0.1585,
+        "MultinomialNB": 0.8192,
+        "LogisticRegression (Balanced)": 0.902,
+        "PyTorch OfficialLegalClauseNet (Selected)": 0.8659
+      },
+      "confusion_matrix": [
+        [
+          28,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          44,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          7,
+          2
+        ],
+        [
+          0,
+          1,
+          3,
+          11
+        ]
+      ]
+    },
+    "official_mof_fiscal_forecaster": {
+      "data_provenance": "100% REAL OFFICIAL DATA (MoF Monthly Report Oct 2026 Table 10/12A + World Bank IMF GFS Egypt)",
+      "model_name": "Ridge Log-Fiscal Forecaster (mof_tax_forecaster.joblib)",
+      "artifact_path": "models/mof_tax_forecaster.joblib",
+      "artifact_kb": 1.7,
+      "chronological_split": {
+        "train_years": "2004-2022 (15 obs)",
+        "test_years": "2023-2027 (5 obs)"
+      },
+      "model_comparison_chronological_test": {
+        "Naive Persistence Baseline": {
+          "mape_pct": 22.36,
+          "mae_billion_egp": 507.58,
+          "rmse_billion_egp": 548.97
+        },
+        "Ridge Log-Fiscal Regression": {
+          "mape_pct": 31.22,
+          "mae_billion_egp": 733.84,
+          "rmse_billion_egp": 807.54
+        },
+        "XGBoost Regressor": {
+          "mape_pct": 58.14,
+          "mae_billion_egp": 1424.98,
+          "rmse_billion_egp": 1632.42
+        }
+      },
+      "selected_model": "Ridge Log-Fiscal Forecaster",
+      "selected_test_metrics": {
+        "mape_pct": 31.22,
+        "mae_billion_egp": 733.84,
+        "rmse_billion_egp": 807.54
+      },
+      "fy_2027_2028_projected_tax_billion_egp": 3956.83,
+      "mof_actual_fy_2024_2025_billion_egp": 2202.28,
+      "mof_budget_fy_2026_2027_billion_egp": 3529.29
+    }
+  },
+  "data_transparency_statement": {
+    "tier1_real_official_government_data": [
+      "models/official_eta_legal_net.pt + official_eta_rag_index.joblib (430 verbatim Arabic passages from 18 official PDFs on eta.gov.eg & media.mof.gov.eg)",
+      "models/mof_tax_forecaster.joblib (Official MoF Monthly Financial Report Oct 2026 Table 10 & 12A + World Bank IMF GFS Egypt 2002-2027)"
+    ],
+    "tier2_privacy_safe_calibrated_prototypes": [
+      "models/arabic_intent_mlp.pt (2,011 Egyptian colloquial citizen queries mapped to official Laws 5/6/7 & Package #2)",
+      "models/sme_formalization_xgb.joblib + expense_estimator_xgb.joblib + tax_anomaly_iforest.joblib (6,000 privacy-safe SME profiles calibrated to published MoF 110K/450K/53K adoption stats & CAPMAS MSME distributions; ready for on-premise retraining inside ETA)."
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+name = "moyasser_kernel"
+version = "1.0.0"
+defaultTargets = ["TaxLaw2025", "moyasser_verifier"]
+
+[[lean_lib]]
+name = "TaxLaw2025"
+
+[[lean_exe]]
+name = "moyasser_verifier"
+root = "Main"

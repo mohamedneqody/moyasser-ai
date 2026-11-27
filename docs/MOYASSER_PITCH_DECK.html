@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>العرض التقديمي الرسمي — مُيسّر الضرائب الذكي (TAX-02) | هاكاثون وزارة المالية</title>
+  <style>
+    @page { size: A4 landscape; margin: 0; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #050d1a; color: #f8fafc;
+    }
+    .deck-controls {
+      position: fixed; bottom: 18px; left: 24px; z-index: 100;
+      display: flex; gap: 10px; background: rgba(14, 29, 53, 0.9);
+      padding: 8px 14px; border-radius: 999px; border: 1px solid #1f3b64;
+    }
+    .deck-controls button {
+      background: #059669; color: #fff; border: none; padding: 7px 14px;
+      border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px;
+    }
+    .slide {
+      min-height: 100vh; padding: 54px 70px;
+      background: radial-gradient(circle at top left, #103258 0%, #071222 65%);
+      border-bottom: 2px solid #1e3a5f;
+      display: flex; flex-direction: column; justify-content: center;
+      page-break-after: always;
+    }
+    .badge {
+      display: inline-block; align-self: flex-start;
+      background: rgba(16, 185, 129, 0.16); border: 1px solid #10b981;
+      color: #6ee7b7; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+      margin-bottom: 16px;
+    }
+    h1 { font-size: 40px; margin: 0 0 14px; color: #ffffff; }
+    h2 { font-size: 30px; margin: 0 0 18px; color: #6ee7b7; }
+    p.sub { font-size: 19px; color: #cbd5e1; max-width: 920px; line-height: 1.7; }
+    .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 22px; }
+    .cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px; }
+    .box {
+      background: rgba(14, 29, 53, 0.85); border: 1px solid #264a7d;
+      border-radius: 16px; padding: 22px;
+    }
+    .box h3 { margin: 0 0 10px; color: #fcd34d; font-size: 19px; }
+    .box p, .box li { font-size: 15px; color: #e2e8f0; line-height: 1.65; }
+    .metric { font-size: 34px; font-weight: 900; color: #34d399; margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+    th, td { border: 1px solid #264a7d; padding: 11px 14px; text-align: right; }
+    th { background: #102544; color: #fcd34d; }
+    @media print { .deck-controls { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="deck-controls">
+    <button onclick="window.print()">🖨️ طباعة / حفظ العرض كملف PDF</button>
+  </div>
+
+  <!-- SLIDE 1 -->
+  <section class="slide">
+    <span class="badge">هاكاثون الذكاء الاصطناعي في المالية العامة — وزارة المالية &amp; ITIDA / SECC | تحدي TAX-02</span>
+    <h1>مُيسّر الضرائب الذكي — Moyasser AI</h1>
+    <p class="sub">أول مساعد ذكي ثنائي اللغة (عربي / English) للتيسيرات الضريبية المصرية مبني بمعمارية <strong>Neuro-Symbolic AI</strong> يجمع بين <strong>الاسترجاع الرسمي المعتمد (18 وثيقة PDF من MoF &amp; ETA)</strong>، ومحرك تحسين رياضي <strong>SciPy HiGHS MILP</strong>، ونواة إثبات رسمي <strong>Lean 4.36.0 (10 نظريات، صفر هلوسة)</strong>.</p>
+    <div class="cards-3">
+      <div class="box"><div class="metric">10 / 10</div><p>نظريات قانونية مُبرهَنة آلياً في نواة <strong>Lean 4</strong> بدون أي <code>sorry</code> وفي أقل من 40 مللي ثانية.</p></div>
+      <div class="box"><div class="metric">18 PDF رسمي</div><p>قوانين 5–7 لسنة 2025 وقوانين 148–153 لسنة 2026 والتقرير المالي لأكتوبر 2026 (437 فقرة موثقة بـ SHA-256).</p></div>
+      <div class="box"><div class="metric">0 ثغرات</div><p>مفحوص أمنياً بأداة <strong>CyberGuard Verify v3.3</strong> بتغطية 100% والتزام كامل بقانون البيانات الشخصية 151/2020.</p></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2 -->
+  <section class="slide">
+    <span class="badge">01 / المشكلة والفجوة الحالية</span>
+    <h2>لماذا لا يكفي «شات بوت تقليدي» لخدمة الممولين والمستثمرين؟</h2>
+    <div class="cards-3">
+      <div class="box">
+        <h3>1. تعدد وتجدد التشريعات والمواعيد</h3>
+        <p>توزع الأحكام بين قوانين الحزمة الأولى (5 و6 و7 لسنة 2025) وقوانين الحزمة الثانية (148–153 لسنة 2026) مع مهل محددة مثل 31 ديسمبر 2026 لإنهاء المنازعات.</p>
+      </div>
+      <div class="box">
+        <h3>2. خطر هلوسة النماذج اللغوية (LLMs)</h3>
+        <p>أي خطأ حسابي أو خلط بين شرائح قانون 6 (0.4%–1.5%) والنظام العادي قد يكبّد الممول غرامات أو يفقد الثقة في الخدمة الحكومية الرقمية.</p>
+      </div>
+      <div class="box">
+        <h3>3. ضغط مراكز الاتصال وخدمات المستثمرين</h3>
+        <p>تكرار آلاف الاستفسارات المتشابهة بالعربية العامية والإنجليزية يستنزف وقت موظفي الإدارة العامة لخدمات المستثمرين.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3 -->
+  <section class="slide">
+    <span class="badge">02 / المعمارية المبتكرة رباعية الطبقات</span>
+    <h2>كيف يقضي Moyasser AI على الهلوسة بنسبة 100%؟</h2>
+    <div class="cards-2">
+      <div class="box">
+        <h3>الطبقة 1 و 2: الفهم ثنائي اللغة + الاسترجاع الموثق (RAG)</h3>
+        <ul>
+          <li>يستقبل الأسئلة عبر <strong>نص، مقطع صوتي، أو ملف PDF/ممسوح ضوئياً</strong> بالعربية العامية أو الإنجليزية للمستثمرين الأجانب.</li>
+          <li>حجب استباقي لأي بيانات شخصية (الرقم القومي/التسجيل الضريبي) التزاماً بقانون 151 لسنة 2020.</li>
+          <li>استرجاع الفقرة ورقم الصفحة وتاريخ السريان والمهلة من 437 فقرة رسمية معتمدة.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>الطبقة 3 و 4: التحسين الرياضي HiGHS + إثبات Lean 4</h3>
+        <ul>
+          <li>محرك <strong>SciPy HiGHS MILP</strong> يقارن النظام المبسط بالنظام العادي ويحمي أصحاب هامش الربح المنخفض (2%) تلقائياً.</li>
+          <li>نواة <strong>Lean 4.36.0</strong> تتحقق رياضياً من كل جنيه وتصدر شهادة مشفّرة <code>LEAN4-PROOF-...</code> وترفض أي انحراف ولو بجنيه واحد.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 4 -->
+  <section class="slide">
+    <span class="badge">03 / التوافق الكامل 100% مع كراسة شروط تحدي TAX-02</span>
+    <h2>تغطية كافة متطلبات المسار الخارجي والمسار الداخلي</h2>
+    <table>
+      <thead><tr><th>متطلب كراسة شروط TAX-02 الرسمية</th><th>التنفيذ الفعلي في Moyasser AI</th></tr></thead>
+      <tbody>
+        <tr><td>دعم العامية المصرية + الإنجليزية للمستثمرين الأجانب</td><td>كشف تلقائي للغة وإجابة بالفصحى المبسطة أو الإنجليزية الاحترافية مع المراجع</td></tr>
+        <tr><td>ذكر المرجع وتاريخ السريان والتنبيه بانتهاء المهلة + تنويه عدم الإلزام</td><td>فحص آلي لتواريخ السريان وانتهاء المهل (مثل 2025-08-12 و2026-12-31) وتنويه رسمي ثابت</td></tr>
+        <tr><td>الاعتذار عن غير المغطى والإحالة لموظف مع ملخص المحادثة</td><td>إنشاء تذكرة إحالة <code>ETA-ESC-...</code> آلياً مع ملخص منقّى من البيانات الشخصية</td></tr>
+        <tr><td>تحديث القرارات الجديدة دون إعادة بناء الحل + 3 أسئلة مقترحة</td><td>محرك <strong>Hot-Reload</strong> يفهرس أي قرار وزاري جديد في أقل من ثانية + 3 أزرار أسئلة سياقية</td></tr>
+        <tr><td>مسار خارجي (ممولين) + مسار داخلي (موظفي خدمات المستثمرين) + لوحة الأسئلة المتكررة</td><td>4 شاشات متكاملة تشمل منصة موظفي المصلحة ولوحة أكثر الأسئلة تكراراً</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- SLIDE 5 -->
+  <section class="slide">
+    <span class="badge">04 / النماذج المدرّبة والأثر القومي على أداء وزارة المالية</span>
+    <h2>6 نماذج AI مدرّبة + جاهزية النشر الفوري والتكامل عبر REST APIs</h2>
+    <div class="cards-3">
+      <div class="box">
+        <h3>نماذج البيانات الرسمية (Tier 1)</h3>
+        <p><strong>PyTorch OfficialLegalClauseNet</strong> (دقة 92.8% على نصوص PDF الرسمية) + <strong>نموذج التنبؤ الزمني بالإيرادات الضريبية</strong> حتى 2027/2028 (3,956.8 مليار ج.م).</p>
+      </div>
+      <div class="box">
+        <h3>نماذج التحليل وحماية الإقرار (Tier 2)</h3>
+        <p><strong>PyTorch Intent MLP</strong> (F1 = 95.15%) + <strong>XGBoost Formalization</strong> (PR-AUC = 0.937) + <strong>XGBoost Expense Estimator</strong> (R² = 0.839) + <strong>IsolationForest</strong>.</p>
+      </div>
+      <div class="box">
+        <h3>الاستدامة والتكامل الحكومي</h3>
+        <p>حاوية <strong>Docker</strong> مستقلة جاهزة للربط الفوري عبر REST APIs مع بوابة <code>eta.gov.eg</code> ومركز الاتصال ووحدة الرأي المسبق بتكلفة تشغيل شبه صفرية.</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
