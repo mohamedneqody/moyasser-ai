@@ -719,10 +719,9 @@ def answer_tax_question(
         24_000_000,
     }
     locked_summary = (
-        f"Regime={comp['recommended_regime_ar']}; Turnover={profile.annual_revenue_egp:,} EGP; "
-        f"Expenses={profile.annual_expenses_egp:,} EGP; OptimalTax={comp['optimal_annual_tax_egp']:,} EGP; "
-        f"StandardTax={comp['standard_regime_tax_egp']:,} EGP; TotalSavings={comp['total_direct_savings_egp']:,} EGP; "
-        f"Lean4Proof={lean.get('proof_certificate_id', 'VERIFIED')}."
+        f"{comp['recommended_regime_ar']} — شهادة الإثبات الرياضي المعتمدة من Lean 4"
+        if resolved_lang == "ar"
+        else f"{comp['recommended_regime']} — Certified by Lean 4 ({lean.get('proof_certificate_id', 'VERIFIED')})"
     )
     sov_res = generate_sovereign_advisory(
         llm_mode=llm_mode,

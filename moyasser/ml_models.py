@@ -12,6 +12,7 @@ import datetime
 import json
 import os
 import re
+import threading
 import unicodedata
 from functools import lru_cache
 from typing import Any, Dict, List, Optional
@@ -19,8 +20,21 @@ from typing import Any, Dict, List, Optional
 import joblib
 import numpy as np
 import pandas as pd
+# Eagerly initialize scikit-learn & xgboost submodules on the main thread at import time
+# to prevent Python multi-threaded lazy-import circular ImportError under concurrent HTTP requests.
+import sklearn.base  # noqa: F401
+import sklearn.compose  # noqa: F401
+import sklearn.ensemble  # noqa: F401
+import sklearn.feature_extraction.text  # noqa: F401
+import sklearn.impute  # noqa: F401
+import sklearn.linear_model  # noqa: F401
+import sklearn.pipeline  # noqa: F401
+import sklearn.preprocessing  # noqa: F401
 import torch
 import torch.nn as nn
+import xgboost  # noqa: F401
+
+_MODEL_LOAD_LOCK = threading.RLock()
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 MODEL_DIR = os.path.join(ROOT_DIR, "models")
@@ -135,33 +149,36 @@ def _dynamic_decrees_path() -> str:
 
 @lru_cache(maxsize=1)
 def _load_official_rag_bundle():
-    rag_path = os.path.join(MODEL_DIR, "official_eta_rag_index.joblib")
-    pt_path = os.path.join(MODEL_DIR, "official_eta_legal_net.pt")
-    if not (os.path.exists(rag_path) and os.path.exists(pt_path)):
-        return None
-    rag = joblib.load(rag_path)
-    records = list(rag["records"])
+    with _MODEL_LOAD_LOCK:
+        rag_path = os.path.join(MODEL_DIR, "official_eta_rag_index.joblib")
+        pt_path = os.path.join(MODEL_DIR, "official_eta_legal_net.pt")
+        if not (os.path.exists(rag_path) and os.path.exists(pt_path)):
+            return None
+        rag = joblib.load(rag_path)
+        records = list(rag["records"])
 
-    # Hot-merge any dynamically added decrees/circulars WITHOUT rebuilding models!
-    dyn_path = _dynamic_decrees_path()
-    if os.path.exists(dyn_path):
-        with open(dyn_path, "r", encoding="utf-8") as fh:
-            for line in fh:
-                if line.strip():
-                    records.append(json.loads(line))
-        clean_texts = [normalize_arabic_text(r.get("text", "")) for r in records]
+        # Hot-merge any dynamically added decrees/circulars WITHOUT rebuilding models!
+        dyn_path = _dynamic_decrees_path()
+        if os.path.exists(dyn_path):
+            with open(dyn_path, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    if line.strip():
+                        records.append(json.loads(line))
+
+        # Index BOTH title and clause body so searching by decree/law title OR content ranks accurately
+        clean_texts = [normalize_arabic_text(f"{r.get('title', '')} {r.get('text', '')}") for r in records]
         rag["matrix"] = rag["vectorizer"].transform(clean_texts)
         rag["records"] = records
 
-    ckpt = torch.load(pt_path, map_location="cpu", weights_only=True)
-    net = OfficialLegalClauseNet(
-        input_dim=int(ckpt["input_dim"]),
-        num_classes=len(ckpt["classes"]),
-        hidden_dim=int(ckpt.get("hidden_dim", 128)),
-    )
-    net.load_state_dict(ckpt["state_dict"])
-    net.eval()
-    return rag, net, list(ckpt["classes"])
+        ckpt = torch.load(pt_path, map_location="cpu", weights_only=True)
+        net = OfficialLegalClauseNet(
+            input_dim=int(ckpt["input_dim"]),
+            num_classes=len(ckpt["classes"]),
+            hidden_dim=int(ckpt.get("hidden_dim", 128)),
+        )
+        net.load_state_dict(ckpt["state_dict"])
+        net.eval()
+        return rag, net, list(ckpt["classes"])
 
 
 def extract_pdf_bytes_text(pdf_bytes: bytes) -> str:
@@ -285,14 +302,30 @@ def search_official_eta_documents(query: str, top_k: int = 3) -> Dict[str, Any]:
         probs = torch.softmax(net(torch.tensor(clf_x, dtype=torch.float32)), dim=1).numpy()[0]
     best_idx = int(np.argmax(probs))
 
-    # 2. Cosine similarity over L2-normalized TF-IDF matrix of all 437 official PDF passages
+    # 2. Cosine similarity over L2-normalized TF-IDF matrix + Legal Domain Alignment Boost
     q_vec = rag["vectorizer"].transform([clean])
-    scores = (rag["matrix"] @ q_vec.T).toarray().ravel()
-    top_indices = np.argsort(scores)[::-1][: max(1, min(top_k, 8))]
+    raw_scores = (rag["matrix"] @ q_vec.T).toarray().ravel()
+    pred_domain = classes[best_idx]
+    has_re_word = any(k in clean for k in ("شقه", "عقار", "فيلا", "ارض", "بيت", "تصرفات عقاريه", "تصرف عقاري"))
+    has_sme_word = any(k in clean for k in ("مطعم", "كافيه", "فريلانسر", "محل", "ورشه", "مبسط", "قانون 6", "مبيعات"))
+
+    adj_scores = raw_scores.copy()
+    for r_i, rec in enumerate(rag["records"]):
+        if raw_scores[r_i] <= 0.01:
+            continue
+        dom = rec.get("domain", "")
+        if dom == pred_domain:
+            adj_scores[r_i] += 0.12
+        if dom == "ETA_REAL_ESTATE_FAQ_2026" and not has_re_word:
+            adj_scores[r_i] *= 0.25
+        if dom == "PKG1_LAWS_5_6_7_2025" and has_sme_word and not has_re_word:
+            adj_scores[r_i] += 0.16
+
+    top_indices = np.argsort(adj_scores)[::-1][: max(1, min(top_k, 8))]
 
     matches: List[Dict[str, Any]] = []
     for idx in top_indices:
-        sc = float(scores[int(idx)])
+        sc = float(adj_scores[int(idx)])
         if sc <= 0.02:
             continue
         rec = rag["records"][int(idx)]
@@ -304,7 +337,7 @@ def search_official_eta_documents(query: str, top_k: int = 3) -> Dict[str, Any]:
                 "title": rec["title"],
                 "page": int(rec["page"]),
                 "official_url": rec["official_url"],
-                "similarity": round(sc, 3),
+                "similarity": round(min(0.99, sc), 3),
                 "excerpt": rec["text"][:360],
             }
         )

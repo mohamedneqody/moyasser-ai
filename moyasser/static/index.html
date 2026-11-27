@@ -441,6 +441,7 @@
     .msg code {
       background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
       padding: 1px 6px; border-radius: 6px; font-family: Consolas, monospace; font-size: 12px;
+      white-space: nowrap;
     }
     .msg strong { color: #064e3b; }
     .msg.user strong { color: #ffffff; }
@@ -951,7 +952,7 @@
       </div>
 
       <div class="card" style="margin-bottom:0;">
-        <h2>🧠 بطاقة الـ 6 موديلات المدرّبة + الـ 10 نظريات الرياضية في نواة Lean 4.36.0</h2>
+        <h2>🧠 بطاقة الـ 7 موديلات المدرّبة + الـ 10 نظريات الرياضية في نواة Lean 4.36.0</h2>
         <table class="t-table" style="margin-bottom:18px;">
           <thead><tr><th>الموديل المدرّب</th><th>ملف الأوزان</th><th>الحجم</th><th>أداء الاختبار الموثّق</th></tr></thead>
           <tbody id="ml-models-body"></tbody>
@@ -970,11 +971,12 @@
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
-    // XSS-safe rich formatter: escapes ALL HTML first, then styles **bold** and `code` cleanly!
+    // XSS-safe rich formatter: escapes ALL HTML first, then styles **bold**, `code`, and _italic_ cleanly!
     function formatRichText(raw) {
       return escHtml(raw)
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
         .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/(^|\s)_([^_\n]+)_(?=\s|$)/g, "$1<em>$2</em>")
         .replace(/\n/g, "<br/>");
     }
 
@@ -1135,6 +1137,7 @@
       av.textContent = role === "bot" ? "م" : "أنت";
       const bubble = document.createElement("div");
       bubble.className = `msg ${role}${isEn ? " en" : ""}`;
+      if (isEn) bubble.setAttribute("dir", "ltr");
       if (isRich) bubble.innerHTML = htmlOrText;
       else bubble.textContent = htmlOrText;
       row.appendChild(av);
@@ -1388,6 +1391,10 @@
             const fm = rm.official_mof_fiscal_forecaster;
             rows.push({ name: "⭐ [بيانات رسمية 100%] " + fm.model_name, file: fm.artifact_path, kb: `${fm.artifact_kb} KB`, metric: `توقع 2027/28: ${fm.fy_2027_2028_projected_tax_billion_egp} مليار ج.م` });
           }
+          if (d.arabic_slot_bigru_tagger) {
+            const bg = d.arabic_slot_bigru_tagger;
+            rows.push({ name: "🔬 " + bg.model_name, file: bg.artifact_path, kb: `${bg.artifact_kb} KB`, metric: `Token Acc: ${(bg.selected_test_metrics.token_accuracy*100).toFixed(1)}% | Macro-F1: ${bg.selected_test_metrics.macro_f1}` });
+          }
           rows.push(
             { name: nlp.model_name, file: nlp.artifacts.weights_path, kb: `${nlp.artifacts.weights_kb} KB`, metric: `Unseen-Phrasing F1: ${nlp.selected_test_metrics.unseen_phrasing_group_macro_f1}` },
             { name: clf.model_name, file: clf.artifact_path, kb: `${clf.artifact_kb} KB`, metric: `PR-AUC: ${clf.selected_test_metrics.pr_auc} | F1: ${clf.selected_test_metrics.f1}` },
@@ -1414,10 +1421,15 @@
       if (rMan.ok) {
         const m = await rMan.json();
         document.getElementById("mof-pdfs-count").textContent = `${m.official_pdfs_count || 0} PDF (${m.official_corpus_chunks || 0} فقرة)`;
-        document.getElementById("official-manifest-body").innerHTML = (m.official_pdfs || []).slice(0, 12).map(doc => `
+        document.getElementById("official-manifest-body").innerHTML = (m.official_pdfs || []).map(doc => {
+          const chunkNote = Number(doc.extracted_chunks || 0) > 0
+            ? `${escHtml(doc.pages)} ص / ${escHtml(doc.extracted_chunks)} فقرة`
+            : `${escHtml(doc.pages)} ص (نسخة رسمية مصوّرة موثقة)`;
+          return `
           <tr><td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:var(--emerald-dark);font-weight:700;">${escHtml(doc.doc_id)}</td>
-          <td>${escHtml(doc.org)}</td><td>${escHtml(doc.title)}</td><td>${escHtml(doc.pages)} ص / ${escHtml(doc.extracted_chunks)} فقرة</td>
-          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:11px;color:var(--muted);">${escHtml((doc.sha256 || "").slice(0, 16))}...</td></tr>`).join("");
+          <td>${escHtml(doc.org)}</td><td>${escHtml(doc.title)}</td><td>${chunkNote}</td>
+          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:11px;color:var(--muted);">${escHtml((doc.sha256 || "").slice(0, 16))}...</td></tr>`;
+        }).join("");
       }
     }
 

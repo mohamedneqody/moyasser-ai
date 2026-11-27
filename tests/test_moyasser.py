@@ -285,3 +285,69 @@ def test_contradictory_inputs_zero_id_and_lean4_numeric_firewall():
     assert "127.0.0.1:11434" in st["endpoint"]
     assert "151/2020" in st["sovereignty"]
 
+
+def test_qa_certification_regressions_all_fixed():
+    # 1. Cafe Arabic query (`ومصاريفه 2 مليون،`) separates 3M revenue from 2M expenses & cites SME law (not real estate!)
+    r_cafe = client.post(
+        "/api/chat",
+        json={"message": "عندي كافيه مبيعاته 3 مليون ومصاريفه 2 مليون، إيه أهم خطوات التسجيل؟", "llm_mode": "instant"},
+    )
+    assert r_cafe.status_code == 200
+    d_cafe = r_cafe.json()
+    assert d_cafe["optimization"]["profile"]["annual_revenue_egp"] == 3_000_000
+    assert d_cafe["optimization"]["profile"]["annual_expenses_egp"] == 2_000_000
+    assert "التصرفات العقارية" not in (d_cafe["official_legal_passages"][0]["title"] if d_cafe["official_legal_passages"] else "")
+
+    # 2. Foreign Investor English query must NEVER trigger Real Estate Disposal Tax (`real_estate_sale_egp == 0`)
+    r_en = client.post(
+        "/api/chat",
+        json={
+            "message": "My software subsidiary in Cairo has annual revenue of 12 million EGP, expenses of 7.5 million EGP, and a VAT refund claim of 450 thousand EGP."
+        },
+    )
+    assert r_en.status_code == 200
+    d_en = r_en.json()
+    assert d_en["optimization"]["profile"]["annual_revenue_egp"] == 12_000_000
+    assert d_en["optimization"]["profile"]["annual_expenses_egp"] == 7_500_000
+    assert d_en["optimization"]["profile"]["real_estate_sale_egp"] == 0
+    assert "Real Estate Disposal Tax" not in d_en["reply_ar"]
+
+    # 3. Sample tax notice scanner separates 2.4M revenue, 1.3M expenses, 60k principal, 95k penalties -> 18,000 EGP Law 6 tax!
+    r_doc = client.post(
+        "/api/scan-document",
+        json={
+            "filename": "notice.txt",
+            "raw_text": "إخطار ضريبي للرقم القومي 29805150102345 — إجمالي المبيعات السنوية 2.4 مليون جنيه، المصروفات 1.3 مليون جنيه، أصل الضريبة 60 ألف، مقابل التأخير 95 ألف جنيه.",
+        },
+    )
+    assert r_doc.status_code == 200
+    d_doc = r_doc.json()
+    assert d_doc["optimization"]["profile"]["annual_revenue_egp"] == 2_400_000
+    assert d_doc["optimization"]["profile"]["annual_expenses_egp"] == 1_300_000
+    assert d_doc["optimization"]["profile"]["dispute_principal_egp"] == 60_000
+    assert d_doc["optimization"]["profile"]["delay_penalties_egp"] == 95_000
+    assert d_doc["optimization"]["comparison"]["optimal_annual_tax_egp"] == 18_000
+
+    # 4. Hot-reload decree title search ranks #1 & Analytics sanitizes fuzz governorates
+    client.post(
+        "/api/knowledge/ingest-decree",
+        json={
+            "doc_id": "ETA_CIRCULAR_30_2026",
+            "title": "تعليمات تنفيذية رقم 30 لسنة 2026 بتيسير فحص مستثمري التكنولوجيا",
+            "raw_text": "تُعفى الشركات التكنولوجية المصدّرة للبرمجيات المنضمة للقائمة البيضاء من تقديم مستندات الفحص الورقية.",
+        },
+    )
+    r_title = client.post("/api/official-data/search", json={"query": "تعليمات تنفيذية رقم 30 لسنة 2026", "top_k": 3})
+    assert r_title.status_code == 200
+    assert any("ETA_CIRCULAR_30_2026" in m["doc_id"] for m in r_title.json()["matches"])
+
+    client.post("/api/optimize", json={"governorate": "1' OR '1'='1", "annual_revenue_egp": 1_000_000})
+    mof = client.get("/api/ministry/analytics").json()
+    assert all("'" not in g["governorate"] for g in mof["by_governorate"])
+
+    # 5. Model metrics includes all 7 models including ArabicSlotBiGRU
+    r_met = client.get("/api/models/metrics")
+    assert r_met.status_code == 200
+    assert "arabic_slot_bigru_tagger" in r_met.json()
+
+

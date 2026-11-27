@@ -235,7 +235,7 @@ def generate_sovereign_advisory(
         "think": False,
         "options": {
             "temperature": 0.12,
-            "num_predict": 135,
+            "num_predict": 220,
             "num_ctx": 2048,
         },
         "messages": [
@@ -253,6 +253,11 @@ def generate_sovereign_advisory(
                 raw_content = str((resp.json().get("message") or {}).get("content") or "").strip()
                 # Strip any residual <think>...</think> tags if emitted by hybrid reasoning weights
                 raw_content = re.sub(r"<think>.*?</think>", "", raw_content, flags=re.DOTALL).strip()
+                # Prevent mid-sentence truncation if token limit was reached
+                if raw_content and raw_content[-1] not in ".!؟۔\n)":
+                    last_end = max(raw_content.rfind("."), raw_content.rfind("۔"), raw_content.rfind("؟"), raw_content.rfind("\n"))
+                    if last_end > 40:
+                        raw_content = raw_content[: last_end + 1].strip()
                 safe_text, intercepted = verify_llm_numeric_alignment(raw_content, allowed_integers, lang=lang)
                 return {
                     "enabled": bool(safe_text),

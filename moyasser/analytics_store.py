@@ -119,14 +119,39 @@ def _connect() -> sqlite3.Connection:
             [(code, ar, en, cnt, now) for code, ar, en, cnt in _SEED_FAQS],
         )
 
+    # Purge any historical security-scanner fuzz payloads (e.g. `1' OR '1'='1` or numeric `1`) from telemetry charts
+    conn.execute(
+        "DELETE FROM policy_telemetry WHERE governorate LIKE '%''%' OR sector LIKE '%''%' "
+        "OR governorate IN ('1', '0', 'test') OR sector IN ('1', '0', 'test')"
+    )
+
     conn.commit()
     return conn
+
+
+_VALID_GOVERNORATES = {"القاهرة", "الجيزة", "الإسكندرية", "مطروح", "الدلتا", "الصعيد", "القناة وسيناء", "أخرى"}
+_VALID_SECTORS = {
+    "مطاعم وأغذية",
+    "تكنولوجيا وبرمجيات",
+    "تجارة تجزئة ومحال",
+    "عمل حر وخدمات رقمية",
+    "خدمات طبية وصحية",
+    "صناعة وورش",
+    "تجارة وخدمات",
+    "نقل ولوجستيات",
+    "مقاولات وعقارات",
+}
 
 
 def record_assessment(result: Dict[str, Any]) -> None:
     profile = result.get("profile", {})
     comp = result.get("comparison", {})
     lean = result.get("lean4_verification", {})
+
+    raw_gov = str(profile.get("governorate", "أخرى")).strip()[:40]
+    safe_gov = raw_gov if raw_gov in _VALID_GOVERNORATES else "أخرى"
+    raw_sec = str(profile.get("sector", "تجارة وخدمات")).strip()[:50]
+    safe_sec = raw_sec if raw_sec in _VALID_SECTORS else "تجارة وخدمات"
 
     conn = _connect()
     try:
@@ -140,8 +165,8 @@ def record_assessment(result: Dict[str, Any]) -> None:
             """,
             (
                 datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                str(profile.get("governorate", "أخرى"))[:40],
-                str(profile.get("sector", "تجارة وخدمات"))[:50],
+                safe_gov,
+                safe_sec,
                 str(comp.get("recommended_regime", "STANDARD"))[:30],
                 int(profile.get("annual_revenue_egp", 0)),
                 int(comp.get("optimal_annual_tax_egp", 0)),

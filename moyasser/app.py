@@ -60,8 +60,7 @@ async def security_headers_middleware(request: Request, call_next):
         "base-uri 'self'; "
         "form-action 'self'"
     )
-    if request.url.path.startswith("/api/"):
-        response.headers["Cache-Control"] = "no-store"
+    response.headers["Cache-Control"] = "no-store" if request.url.path.startswith("/api/") else "no-cache"
     return response
 
 

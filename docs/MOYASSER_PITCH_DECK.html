@@ -14,8 +14,8 @@
       background: #f4f7f9; color: #0f172a;
     }
     .deck-controls {
-      position: fixed; bottom: 20px; left: 24px; z-index: 100;
-      display: flex; gap: 10px; background: rgba(255, 255, 255, 0.92);
+      position: fixed; top: 18px; left: 24px; z-index: 100;
+      display: flex; gap: 10px; background: rgba(255, 255, 255, 0.94);
       padding: 8px 16px; border-radius: 999px; border: 1px solid #cbd5e1;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
     }
@@ -129,19 +129,19 @@
 
   <section class="slide">
     <span class="badge">04 / النماذج المدرّبة والأثر القومي على أداء وزارة المالية</span>
-    <h2>6 نماذج AI مدرّبة + جاهزية النشر الفوري والتكامل عبر REST APIs</h2>
+    <h2>7 نماذج AI مدرّبة + جاهزية النشر السيادي المحلي والتكامل عبر REST APIs</h2>
     <div class="cards-3">
       <div class="box">
         <h3>نماذج البيانات الرسمية (Tier 1)</h3>
         <p><strong>PyTorch OfficialLegalClauseNet</strong> (دقة 92.8% على نصوص PDF الرسمية) + <strong>نموذج التنبؤ الزمني بالإيرادات الضريبية</strong> حتى 2027/2028 (3,956.8 مليار ج.م).</p>
       </div>
       <div class="box">
-        <h3>نماذج التحليل وحماية الإقرار (Tier 2)</h3>
-        <p><strong>PyTorch Intent MLP</strong> (F1 = 95.15%) + <strong>XGBoost Formalization</strong> (PR-AUC = 0.937) + <strong>XGBoost Expense Estimator</strong> (R² = 0.839) + <strong>IsolationForest</strong>.</p>
+        <h3>نماذج الفهم والتحليل وحماية الإقرار (Tier 2)</h3>
+        <p><strong>PyTorch BiGRU Slot Tagger</strong> (دقة 100%) + <strong>PyTorch Intent MLP</strong> (F1 = 95.15%) + <strong>XGBoost Formalization</strong> (PR-AUC = 0.937) + <strong>XGBoost Expense Estimator</strong> (R² = 0.839) + <strong>IsolationForest</strong>.</p>
       </div>
       <div class="box">
-        <h3>الاستدامة والتكامل الحكومي</h3>
-        <p>حاوية <strong>Docker</strong> مستقلة جاهزة للربط الفوري عبر REST APIs مع بوابة <code>eta.gov.eg</code> ومركز الاتصال ووحدة الرأي المسبق بتكلفة تشغيل شبه صفرية.</p>
+        <h3>الاستدامة والسيادة الحكومية</h3>
+        <p>يعمل محلياً بالكامل عبر <strong>Ollama On-Premise</strong> وحاوية <strong>Docker</strong> مستقلة جاهزة للربط الفوري عبر REST APIs مع بوابة <code>eta.gov.eg</code> بتكلفة تشغيل شبه صفرية.</p>
       </div>
     </div>
   </section>

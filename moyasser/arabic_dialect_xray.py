@@ -176,37 +176,47 @@ def compile_egyptian_spoken_numbers(text: str) -> Tuple[str, List[Dict[str, Any]
     return re.sub(r"\s+", " ", s).strip(), conversions
 
 
-def _predict_token_slots(tokens: List[str]) -> List[Tuple[str, float]]:
+def _predict_token_slots(tokens: List[str]) -> List[Tuple[str, float, bool]]:
     bundle = _load_slot_bigru()
     if not bundle or not tokens:
-        return [("O", 0.0) for _ in tokens]
+        return [("O", 0.0, False) for _ in tokens]
     model, vocab, tags = bundle
+    unk_id = vocab.get("<UNK>", 1)
     ids = []
+    known_flags = []
     for tok in tokens:
         nt = _norm_token(tok)
-        if re.fullmatch(r"\d+(?:[.,]\d+)?", nt):
+        is_num = bool(re.fullmatch(r"\d+(?:[.,]\d+)?", nt))
+        if is_num:
             nt = "<NUM>"
         elif nt not in vocab and nt.startswith("و") and len(nt) >= 4 and nt[1:] in vocab:
             nt = nt[1:]
-        ids.append(vocab.get(nt, vocab.get("<UNK>", 1)))
+        tid = vocab.get(nt, unk_id)
+        ids.append(tid)
+        known_flags.append((tid != unk_id) and (not is_num))
     x = torch.tensor([ids], dtype=torch.long)
     with torch.no_grad():
         probs = torch.softmax(model(x), dim=-1)[0].numpy()
     out = []
-    for p in probs:
+    for p, known in zip(probs, known_flags):
         idx = int(np.argmax(p))
-        out.append((tags[idx], round(float(p[idx]) * 100.0, 1)))
+        out.append((tags[idx], round(float(p[idx]) * 100.0, 1), known))
     return out
 
 
 _NEG_WORDS = {"معليش", "معنديش", "مفيش", "بدون", "معلش", "لايوجد", "مدفعتش", "مبعتش", "مش", "عدم", "zero", "no", "without"}
 
+_REAL_ESTATE_GUARD_WORDS = {
+    "شقه", "عقار", "فيلا", "ارض", "بيت", "تمليك", "تصرفات", "عقاريه", "عقاري",
+    "apartment", "property", "villa", "estate", "house", "flat",
+}
+
 _ROLE_LEXICON = {
     "REV": {"مبيعات", "مبيعاتي", "مبيعاته", "مبيعاتها", "مبيعاتنا", "ايراد", "ايرادات", "ايراداتي", "ايراداته", "ايراداتها", "دخل", "دخلي", "حجم", "اعمال", "ببيع", "بعمل", "باكسب", "شغلي", "يومي", "يوميتي", "revenue", "turnover", "sales"},
     "EXP": {"مصاريف", "مصاريفي", "مصاريفه", "مصاريفها", "مصاريفنا", "مصروفات", "مصروفاتي", "مصروفاته", "مصروفاتها", "تكاليف", "تكاليفي", "تكاليفها", "بدفع", "ادفع", "ايجار", "بضاعه", "خامات", "رواتب", "مرتبات", "نفقات", "expenses", "costs"},
-    "PEN": {"غرامه", "غرامات", "تأخير", "تاخير", "فوائد", "عقوبات", "penalty", "penalties"},
-    "PRINC": {"اصل", "أصل", "دين", "مطالبه", "نزاع", "principal", "dispute"},
-    "RE_VAL": {"شقه", "عقار", "فيلا", "ارض", "بيت", "محل", "بعت", "بيع", "تصرف", "تصرفات", "عقاريه", "apartment", "property", "villa"},
+    "PEN": {"غرامه", "غرامات", "تأخير", "تاخير", "مقابل", "فوائد", "عقوبات", "penalty", "penalties"},
+    "PRINC": {"اصل", "أصل", "دين", "مطالبه", "نزاع", "principal", "dispute", "disputed"},
+    "RE_VAL": {"شقه", "عقار", "فيلا", "ارض", "بيت", "تصرفات", "عقاريه", "apartment", "property", "villa"},
     "VAT": {"مضافه", "المضافه", "رد", "دائن", "vat", "refund"},
 }
 
@@ -251,28 +261,39 @@ def analyze_egyptian_dialect_xray(message: str) -> Dict[str, Any]:
 
     spans: List[Dict[str, Any]] = []
     slots_egp: Dict[str, int] = {}
-    clause_boundaries = {"و", "لكن", "بس", "اما", "أو", "او", "بينما", "and", "but", "while"}
+    clause_boundaries = {"و", "لكن", "بس", "اما", "أو", "او", "بينما", "ثما", "ثم", "and", "but", "while", "—", "–", "-"}
+    has_re_context = any(
+        (nt in _REAL_ESTATE_GUARD_WORDS) or (nt.startswith("و") and nt[1:] in _REAL_ESTATE_GUARD_WORDS)
+        for nt in norm_tokens
+    ) or ("real estate" in (message or "").lower())
+
+    def _ends_clause_punct(idx_tok: int) -> bool:
+        raw_t = tokens[idx_tok].strip()
+        return bool(raw_t) and raw_t[-1] in {",", "،", ";", "؛", ".", "!", "?", "؟", ":", "—", "–"}
 
     def _is_clause_start_token(idx_tok: int) -> bool:
         nt = norm_tokens[idx_tok]
         if nt in clause_boundaries:
             return True
-        # Arabic attached `و` conjunction starting a new financial clause (`ومصاريفي`, `وعليا`, `وليا`, `وبدفع`, `ومعليش`)
+        # Arabic attached `و` conjunction starting a new financial clause (`ومصاريفي`, `والمصروفات`, `ومصاريفه`, `وعليا`)
         if nt.startswith("و") and len(nt) >= 4:
             stem = nt[1:]
+            if stem.startswith("ال") and len(stem) >= 5:
+                stem = stem[2:]
             if any(
                 stem.startswith(root)
                 for root in (
                     "مصاريف", "مصروف", "تكاليف", "نفقات", "مبيعات", "ايراد",
                     "عليا", "علي", "ليا", "بدفع", "بعمل", "معليش", "معنديش",
-                    "مفيش", "بدون", "اصل", "غرام",
+                    "مفيش", "بدون", "اصل", "غرام", "مقابل",
                 )
             ):
                 return True
         return False
+
     i = 0
     while i < len(tokens):
-        clean_num = tokens[i].replace(",", "")
+        clean_num = tokens[i].replace(",", "").rstrip("،.;؛:!?؟")
         m_num = re.fullmatch(r"(\d+(?:\.\d+)?)", clean_num)
         if not m_num:
             # Also check attached prefix like `ب4` or `بـ3`
@@ -319,17 +340,17 @@ def analyze_egyptian_dialect_xray(message: str) -> Dict[str, Any]:
             i = end_i + 1
             continue
 
-        # Determine semantic role using BiGRU Contextual Tagging + Bidirectional Clause Window!
+        # Determine semantic role using BiGRU Contextual Tagging + Punctuation-Aware Bidirectional Clause Window!
         left_start = i
-        while left_start > max(0, i - 4):
+        while left_start > max(0, i - 5):
             if _is_clause_start_token(left_start):
                 break
-            if norm_tokens[left_start - 1] in clause_boundaries:
+            if norm_tokens[left_start - 1] in clause_boundaries or _ends_clause_punct(left_start - 1):
                 break
             left_start -= 1
         right_end = end_i
         while right_end + 1 < min(len(tokens), end_i + 4):
-            if _is_clause_start_token(right_end + 1):
+            if _ends_clause_punct(right_end) or _is_clause_start_token(right_end + 1):
                 break
             right_end += 1
 
@@ -337,27 +358,37 @@ def analyze_egyptian_dialect_xray(message: str) -> Dict[str, Any]:
         role_scores: Dict[str, float] = {r: 0.0 for r in SLOT_LABELS_AR}
         best_conf = 86.0
 
-        # 1. BiGRU contextual predictions on the number token and immediate neighbors
+        # 1. BiGRU contextual predictions ONLY on known in-vocabulary Arabic tokens (never <UNK> English words!)
         for pos in range(left_start, right_end + 1):
-            pred_tag, pred_conf = slot_preds[pos]
+            pred_tag, pred_conf, is_known = slot_preds[pos]
+            if not is_known:
+                continue
             dist = 0 if (i <= pos <= end_i) else min(abs(pos - i), abs(pos - end_i))
-            weight = 1.2 if dist == 0 else (1.0 / dist)
+            weight = 1.0 if dist == 0 else (0.8 / dist)
             if pred_tag in role_scores:
+                if pred_tag == "RE_VAL" and not has_re_context:
+                    continue
                 role_scores[pred_tag] += (pred_conf / 100.0) * weight
                 best_conf = max(best_conf, pred_conf)
 
-        # 2. Bidirectional lexicon cues (handles BOTH `مبيعاتي 4 مليون` AND `4 مليون مبيعات`!)
+        # 2. Bidirectional explicit lexicon cues (decisive priority within the local clause, handling `و` and `ال` prefixes!)
         for pos in range(left_start, right_end + 1):
             if i <= pos <= end_i:
                 continue
             nt = norm_tokens[pos]
             nt_stripped = nt[1:] if (nt.startswith("و") and len(nt) >= 4) else nt
+            nt_core = nt_stripped[2:] if (nt_stripped.startswith("ال") and len(nt_stripped) >= 5) else nt_stripped
             dist = min(abs(pos - i), abs(pos - end_i))
-            prox_bonus = 3.2 / max(1, dist)
+            prox_bonus = 8.5 / max(1, dist)
             for role, lex in _ROLE_LEXICON.items():
-                if nt in lex or nt_stripped in lex:
+                if role == "RE_VAL" and not has_re_context:
+                    continue
+                if nt in lex or nt_stripped in lex or nt_core in lex:
                     role_scores[role] += prox_bonus
-                    best_conf = max(best_conf, 97.5)
+                    best_conf = max(best_conf, 98.2)
+
+        if not has_re_context:
+            role_scores["RE_VAL"] = 0.0
 
         chosen_role = max(role_scores.items(), key=lambda kv: kv[1])[0]
         if role_scores[chosen_role] < 0.25:
