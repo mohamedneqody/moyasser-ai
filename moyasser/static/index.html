@@ -533,6 +533,7 @@
       </div>
       <div class="status-pills">
         <span class="pill ok">✓ إثبات رياضي Lean 4 (10/10 نظريات)</span>
+        <span class="pill ok" id="ollama-top-pill">🏛️ سيادة محلية 100%: فحص Ollama...</span>
         <span class="pill gold">📚 18 تشريع ودليل رسمي (MoF &amp; ETA)</span>
         <a class="pill ok" href="/pitch-deck" target="_blank">📊 العرض التقديمي للمشروع</a>
       </div>
@@ -599,16 +600,24 @@
       <div class="chat-layout">
         <div class="card" style="margin-bottom:0;">
           <h2>
-            <span>💬 استشر «مُيسّر» بلغة طبيعية (ممولين مصريين ومستثمرين أجانب)</span>
-            <select id="chat-lang" style="width:auto; padding:6px 12px; font-size:12.5px;">
-              <option value="auto">🌐 كشف تلقائي للغة (AR / EN)</option>
-              <option value="ar">العربية (فصحى مبسطة)</option>
-              <option value="en">English (Foreign Investors)</option>
-            </select>
+            <span>💬 استشر «مُيسّر» بلغة طبيعية (بدون الحاجة لرقم قومي أو بطاقة ضريبية)</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <select id="chat-llm-mode" title="اختر محرك الصياغة السيادي المحلي عبر Ollama" style="width:auto; padding:6px 11px; font-size:12px; border-color:#a7f3d0; background:#ecfdf5; color:#065f46; font-weight:800;">
+                <option value="instant">⚡ وضع فوري حتمي (&lt; 40ms — Lean 4 مباشر)</option>
+                <option value="lfm-fast">🚀 مستشار محلي سريع: Liquid LFM-Q4 (GPU أوفلاين + Lean 4)</option>
+                <option value="qwen-hybrid">🏛️ مستشار محلي متعمق: Qwen-Hybrid (Ollama أوفلاين + Lean 4)</option>
+              </select>
+              <select id="chat-lang" style="width:auto; padding:6px 12px; font-size:12.5px;">
+                <option value="auto">🌐 كشف تلقائي للغة (AR / EN)</option>
+                <option value="ar">العربية (فصحى مبسطة)</option>
+                <option value="en">English (Foreign Investors)</option>
+              </select>
+            </div>
           </h2>
 
           <div class="presets">
             <button class="preset-btn chat-chip" style="border-color:#059669; background:#ecfdf5; color:#065f46;" data-q="ببيع في المطعم بحوالي ميتين ألف في الشهر ومصاريفي مليون ونص في السنة ومعليش أي غرامات">🔬 اختبار العامية الذكي: ميتين ألف شهرياً + مليون ونص + نفي غرامات</button>
+            <button class="preset-btn chat-chip" style="border-color:#fcd34d; background:#fffbeb; color:#92400e;" data-q="مبيعاتي 800 ألف في السنة ومصاريفي 3 مليون وعليا غرامات 90 ألف من غير ما أكتب أصل الضريبة">⚠️ اختبار بيانات متناقضة/ناقصة (بدون رقم قومي)</button>
             <button class="preset-btn chat-chip" data-q="عندي مطعم في الجيزة مبيعاته 4 مليون ومصاريفه 2.5 مليون وعليا غرامات 180 ألف وأصل ضريبة 100 ألف">🍽️ مطعم 4 مليون + تسوية غرامات</button>
             <button class="preset-btn chat-chip" data-q="أنا فريلانسر دخلي 900 ألف في السنة ولسه مفتحتش ملف ضريبي">💻 فريلانسر 900 ألف بدون ملف</button>
             <button class="preset-btn chat-chip" data-q="بعت شقة بـ 3 مليون لابني، عليا ضريبة تصرفات عقارية كام؟">🏠 بيع شقة لابني (درجة أولى)</button>
@@ -1157,18 +1166,45 @@
       </div>`;
     }
 
+    function buildSovereignBadgeHtml(sov) {
+      if (!sov || !sov.enabled) return "";
+      const fw = sov.hallucination_intercepted
+        ? "🛡️ جدار Lean 4 حجب تقريباً لغوياً وثبّت الرقم الرسمي"
+        : "✓ جدار حماية Lean 4 للأرقام: سليم 100%";
+      return `<div class="xray-box" style="border-color:#6ee7b7; background:#ecfdf5;">
+        <div class="xray-title" style="color:#065f46;">🏛️ معالجة سيادية محلية 100% داخل الجهاز (On-Premise Ollama — بدون سحابة خارجية):</div>
+        <div class="xray-pills">
+          <span class="x-pill REV">الموديل المحلي: <strong>${escHtml(sov.model)}</strong></span>
+          <span class="x-pill EXP">زمن التوليد: <strong>${escHtml(sov.elapsed_ms)} ms</strong></span>
+          <span class="x-pill REV">${escHtml(fw)}</span>
+        </div>
+      </div>`;
+    }
+
     async function sendChat(text) {
       const lang = document.getElementById("chat-lang").value;
+      const llmMode = document.getElementById("chat-llm-mode").value;
       appendMessage("user", text, false, false);
+
+      let pendingRow = null;
+      if (llmMode !== "instant") {
+        const box = document.getElementById("chat-box");
+        pendingRow = document.createElement("div");
+        pendingRow.className = "msg-row bot";
+        pendingRow.innerHTML = `<div class="avatar bot">م</div><div class="msg bot">⏳ جارٍ تشغيل <strong>Lean 4 + HiGHS</strong> ثم صياغة التوجيه عبر الموديل السيادي المحلي (<code>${escHtml(llmMode)}</code>)...</div>`;
+        box.appendChild(pendingRow);
+        box.scrollTop = box.scrollHeight;
+      }
 
       const resp = await fetch("/api/chat", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, lang, conversation_history: chatHistory.slice(-6) })
+        body: JSON.stringify({ message: text, lang, llm_mode: llmMode, conversation_history: chatHistory.slice(-6) })
       });
+      if (pendingRow) pendingRow.remove();
       chatHistory.push(text);
       if (resp.ok) {
         const data = await resp.json();
-        const richHtml = formatRichText(data.reply_ar) + buildXrayHtml(data.dialect_xray);
+        const richHtml = formatRichText(data.reply_ar) + buildXrayHtml(data.dialect_xray) + buildSovereignBadgeHtml(data.sovereign_llm);
         appendMessage("bot", richHtml, data.lang === "en", true);
         renderFollowups(data.suggested_followups || []);
         if (data.optimization) renderOptimization(data.optimization);
@@ -1458,10 +1494,36 @@
       if (q) runOfficialSearch(q);
     });
 
+    async function loadLocalLlmStatus() {
+      const pill = document.getElementById("ollama-top-pill");
+      const sel = document.getElementById("chat-llm-mode");
+      try {
+        const resp = await fetch("/api/local-llm/status");
+        if (!resp.ok) return;
+        const st = await resp.json();
+        if (st.online && st.installed_count > 0) {
+          pill.className = "pill ok";
+          pill.textContent = `🏛️ سيادة محلية 100%: Ollama نشط (${st.installed_count} موديل أوفلاين)`;
+          if (st.recommended_lfm_model && sel.options[1]) {
+            sel.options[1].textContent = `🚀 مستشار محلي سريع: ${st.recommended_lfm_model} (GPU + Lean 4)`;
+          }
+          if (st.recommended_qwen_model && sel.options[2]) {
+            sel.options[2].textContent = `🏛️ مستشار محلي متعمق: ${st.recommended_qwen_model} (Ollama + Lean 4)`;
+          }
+        } else {
+          pill.className = "pill gold";
+          pill.textContent = "⚡ الوضع الفوري الحتمي نشط (شغّل Ollama للموديل المحلي)";
+        }
+      } catch (_) {
+        pill.textContent = "⚡ الوضع الفوري الحتمي Lean 4 نشط";
+      }
+    }
+
     runOptimization();
     loadMinistryAnalytics();
     loadLeanAndModels();
     loadEscalations();
+    loadLocalLlmStatus();
   </script>
 </body>
 </html>

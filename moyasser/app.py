@@ -26,6 +26,7 @@ from .ml_models import (
 )
 from .optimizer import TaxpayerProfile, optimize_tax_strategy
 from .pdf_export import build_arabic_roadmap_html, export_roadmap_pdf
+from .sovereign_llm import get_local_ollama_status
 
 _STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 _LEAN_SRC = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lean_kernel", "TaxLaw2025.lean"))
@@ -85,6 +86,8 @@ class ProfilePayload(BaseModel):
 class ChatPayload(BaseModel):
     message: str = Field(..., min_length=1, max_length=2500)
     lang: str = Field(default="auto", pattern="^(auto|ar|en)$")
+    llm_mode: str = Field(default="instant", pattern="^(instant|qwen-hybrid|lfm-fast|auto-local)$")
+    llm_model: Optional[str] = Field(default=None, max_length=64, pattern="^[A-Za-z0-9._:-]+$")
     profile_override: Optional[Dict[str, Any]] = None
     conversation_history: Optional[List[str]] = Field(default=None, max_length=12)
 
@@ -147,18 +150,26 @@ def serve_pitch_deck():
 def api_health():
     lean_bin = find_lean_verifier_binary()
     ml_status = models_ready()
+    ollama_st = get_local_ollama_status()
     return {
         "status": "ok",
         "track": "TAX-02 — مساعد ذكى للتيسيرات الضريبية",
-        "service": "Moyasser AI v2.0 — Bilingual Neuro-Symbolic Tax Facilitation Assistant",
-        "privacy_compliance": "Egyptian Personal Data Protection Law No. 151 of 2020",
+        "service": "Moyasser AI v2.5 — Sovereign Bilingual Neuro-Symbolic Tax Facilitation Assistant",
+        "privacy_compliance": "Egyptian Personal Data Protection Law No. 151 of 2020 (Anonymous-by-Design)",
         "milp_solver": "SciPy HiGHS",
         "lean4_kernel_ready": bool(lean_bin),
         "lean4_theorems": 10,
         "sorry_count": 0,
         "ml_models_ready": all(ml_status.values()),
         "ml_models": ml_status,
+        "sovereign_ollama_online": ollama_st["online"],
+        "sovereign_ollama_models": len(ollama_st["installed_models"]),
     }
+
+
+@app.get("/api/local-llm/status")
+def api_local_llm_status():
+    return JSONResponse(content=get_local_ollama_status())
 
 
 @app.get("/api/lean4/theorems")
@@ -204,6 +215,8 @@ def api_chat(payload: ChatPayload):
         profile_override=payload.profile_override,
         lang=payload.lang,
         conversation_history=payload.conversation_history,
+        llm_mode=payload.llm_mode,
+        llm_model=payload.llm_model,
     )
     if res.get("optimization"):
         record_assessment(res["optimization"])

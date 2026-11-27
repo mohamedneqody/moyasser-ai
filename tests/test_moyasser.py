@@ -251,3 +251,37 @@ def test_killer_egyptian_dialect_xray_spoken_monthly_reversed_and_negation():
     r3 = client.post("/api/chat", json={"message": "شركتي مبيعاتها 19.5 مليون ومصاريفها 14 مليون"})
     assert r3.status_code == 200
     assert "24,000,000" in (r3.json().get("cliff_edge_alert") or "")
+
+
+def test_contradictory_inputs_zero_id_and_lean4_numeric_firewall():
+    from moyasser.sovereign_llm import verify_llm_numeric_alignment
+
+    # 1. Anonymous-by-Design (no National ID / Tax ID) + Contradictory inputs (Expenses > Revenue & Penalty w/o Principal)
+    r_bad = client.post(
+        "/api/chat",
+        json={
+            "message": "مبيعاتي 800 ألف في السنة ومصاريفي 3 مليون وعليا غرامات 90 ألف من غير ما أكتب أصل الضريبة",
+            "llm_mode": "instant",
+        },
+    )
+    assert r_bad.status_code == 200
+    d_bad = r_bad.json()
+    assert d_bad["pii_protection"]["redacted_count"] == 0
+    assert len(d_bad.get("data_quality_alerts") or []) >= 2
+    assert d_bad["optimization"]["comparison"]["standard_regime_tax_egp"] == 0
+    assert d_bad["optimization"]["lean4_verification"]["lean4_verified"] is True
+
+    # 2. Lean 4 Post-Generation Numeric Hallucination Firewall intercepts wrong LLM math (e.g., 6,750 instead of 18,000)
+    hallucinated = "الضريبة المستحقة هي 6,750 ج.م وفق حساب صافي الربح.\nيرجى التسجيل عبر البوابة الإلكترونية لمصلحة الضرائب."
+    cleaned, intercepted = verify_llm_numeric_alignment(hallucinated, {2_400_000, 1_500_000, 18_000, 164_500}, lang="ar")
+    assert intercepted is True
+    assert "6,750" not in cleaned
+    assert "البوابة الإلكترونية" in cleaned
+
+    # 3. Sovereign Local LLM Status endpoint confirms strict loopback sovereignty
+    r_llm = client.get("/api/local-llm/status")
+    assert r_llm.status_code == 200
+    st = r_llm.json()
+    assert "127.0.0.1:11434" in st["endpoint"]
+    assert "151/2020" in st["sovereignty"]
+

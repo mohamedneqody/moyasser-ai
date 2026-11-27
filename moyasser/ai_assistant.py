@@ -19,6 +19,7 @@ from .ml_models import (
     search_official_eta_documents,
 )
 from .optimizer import TaxpayerProfile, optimize_tax_strategy
+from .sovereign_llm import generate_sovereign_advisory
 from .tax_laws import NON_BINDING_DISCLAIMER_AR, NON_BINDING_DISCLAIMER_EN
 
 _ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩٫٬", "0123456789.,")
@@ -474,11 +475,59 @@ def process_voice_query(
     }
 
 
+def validate_input_data_quality(profile: TaxpayerProfile, lang: str = "ar") -> List[str]:
+    """
+    Detects contradictory, incomplete, or typo-prone financial inputs WITHOUT requiring any personal ID:
+      1. Expenses exceeding revenue (operating loss vs. extra-zero clerical typo).
+      2. Delay penalties entered without specifying the disputed principal tax (needed for Law 7 100% cap).
+      3. Turnover above 20M EGP enrollment cap (distinguishing 20M-24M one-time grace ceiling vs. >24M).
+    """
+    alerts: List[str] = []
+    if profile.annual_revenue_egp > 0 and profile.annual_expenses_egp > profile.annual_revenue_egp:
+        if lang == "en":
+            alerts.append(
+                f"Input Check: Entered expenses ({profile.annual_expenses_egp:,} EGP) exceed revenue ({profile.annual_revenue_egp:,} EGP). "
+                "If this reflects an audited operating loss, Standard Tax is 0 EGP; otherwise please check for an extra zero."
+            )
+        else:
+            alerts.append(
+                f"فحص اتساق الأرقام: المصروفات المدخلة (**{profile.annual_expenses_egp:,} ج.م**) أكبر من الإيرادات (**{profile.annual_revenue_egp:,} ج.م**). "
+                "إذا كانت المنشأة تحقق خسارة فعلية مؤيدة بدفاتر منتظمة فضريبة النظام العادي = **0 ج.م**، أما إن كان هناك صفر زائد بالخطأ فيرجى مراجعته."
+            )
+
+    if profile.delay_penalties_egp > 0 and profile.dispute_principal_egp == 0:
+        if lang == "en":
+            alerts.append(
+                f"Missing Detail: Delay penalties ({profile.delay_penalties_egp:,} EGP) were mentioned without the principal tax amount (`أصل الضريبة`). "
+                "Please share the approximate principal tax to verify the Law 7/2025 100% cap alongside dispute waiver."
+            )
+        else:
+            alerts.append(
+                f"بيان تكميلي مستحسن: ذكرتم غرامات تأخير (**{profile.delay_penalties_egp:,} ج.م**) دون تحديد **أصل الضريبة المستحقة**؛ "
+                "يُفضل ذكر أصل الضريبة التقريبي لحساب سقف الـ 100% في القانون 7 لسنة 2025 بدقة."
+            )
+
+    if 20_000_000 < profile.annual_revenue_egp <= 24_000_000:
+        if lang == "en":
+            alerts.append(
+                "Turnover Ceiling Note: Turnover exceeds the 20M EGP initial enrollment cap, so Standard Regime applies for new applicants "
+                "(existing Law 6 enrollees enjoy a one-time 20% grace ceiling up to 24,000,000 EGP at 1.5%)."
+            )
+        else:
+            alerts.append(
+                "تنبيه سقف الأعمال: إيرادكم يتجاوز سقف الـ **20,000,000 ج.م** للانضمام الأولي لقانون 6، لذا يُطبَّق النظام العادي للمنضمين الجدد "
+                "(بينما يستفيد المسجلون مسبقاً بالنظام المبسط من مهلة تجاوز 20% لمرة واحدة حتى **24,000,000 ج.م**)."
+            )
+    return alerts
+
+
 def answer_tax_question(
     message: str,
     profile_override: Optional[Dict[str, Any]] = None,
     lang: str = "auto",
     conversation_history: Optional[List[str]] = None,
+    llm_mode: str = "instant",
+    llm_model: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Official TAX-02 Bilingual (Simplified MSA Arabic + Foreign Investor English) Neuro-Symbolic Copilot:
@@ -555,6 +604,7 @@ def answer_tax_question(
     official_rag = search_official_eta_documents(redacted_msg, top_k=2)
     profile, signals = extract_profile_from_arabic_text(redacted_msg, base_profile=profile_override)
     cliff_alert = compute_cliff_edge_sensitivity_alert(profile.annual_revenue_egp, profile.annual_expenses_egp)
+    quality_alerts = validate_input_data_quality(profile, lang=resolved_lang)
 
     has_numbers = any(
         [
@@ -568,6 +618,25 @@ def answer_tax_question(
     followups = _get_followups(intent_pred["intent"], resolved_lang)
 
     if not has_numbers:
+        sov_no_num = generate_sovereign_advisory(
+            llm_mode=llm_mode,
+            explicit_model=llm_model,
+            user_query=redacted_msg,
+            lang=resolved_lang,
+            locked_facts_summary=f"Intent={intent_pred['intent_ar']} ({intent_pred['confidence_pct']}%). No financial numbers provided yet; anonymous inquiry without personal ID is fully supported.",
+            rag_passages=official_rag.get("matches", []),
+            data_quality_alerts=quality_alerts,
+            allowed_integers={6, 5, 7, 20, 24, 60, 100, 148, 149, 150, 151, 152, 153},
+        )
+        sov_block = ""
+        if sov_no_num.get("enabled") and sov_no_num.get("advisory_text"):
+            hdr = (
+                f"\n\n🏛️ **Sovereign On-Premise Advisor (`{sov_no_num['model']}` — {sov_no_num['elapsed_ms']} ms):**\n"
+                if resolved_lang == "en"
+                else f"\n\n🏛️ **توجيه المستشار السيادي المحلي (`{sov_no_num['model']}` — {sov_no_num['elapsed_ms']} مللي ثانية):**\n"
+            )
+            sov_block = hdr + sov_no_num["advisory_text"]
+
         if resolved_lang == "en":
             return {
                 "lang": "en",
@@ -579,11 +648,14 @@ def answer_tax_question(
                     "**SciPy HiGHS MILP Optimizer + Lean 4.36.0 Formal Kernel (10 theorems, 0 sorry)** can compute and certify your exact position.\n\n"
                     "Examples for Foreign Investors & SMEs:\n"
                     "• `My software subsidiary in Cairo has annual revenue of 12 million EGP, expenses of 7.5 million EGP, and a VAT refund claim of 450 thousand EGP.`\n"
-                    "• `We have an old tax dispute with principal 100 thousand EGP and delay penalties 180 thousand EGP.`\n\n"
-                    f"ℹ️ _{NON_BINDING_DISCLAIMER_EN}_"
+                    "• `We have an old tax dispute with principal 100 thousand EGP and delay penalties 180 thousand EGP.`"
+                    + sov_block
+                    + f"\n\nℹ️ _{NON_BINDING_DISCLAIMER_EN}_"
                 ),
                 "pii_protection": pii_report,
                 "ml_intent": intent_pred,
+                "data_quality_alerts": quality_alerts,
+                "sovereign_llm": sov_no_num,
                 "official_legal_passages": official_rag.get("matches", []),
                 "suggested_followups": followups,
                 "disclaimer": NON_BINDING_DISCLAIMER_EN,
@@ -604,13 +676,16 @@ def answer_tax_question(
             "escalation": None,
             "reply_ar": (
                 f"🧠 **المسار الضريبي المصنّف ({intent_pred['confidence_pct']}%):** {intent_pred['intent_ar']}\n\n"
-                "يرجى ذكر الأرقام المالية التقريبية لحالتك (مثل حجم الأعمال السنوي، المصروفات، أو قيمة التصرف العقاري — **دون إدخال الرقم القومي أو رقم التسجيل الضريبي**) "
+                "يرجى ذكر الأرقام المالية التقريبية لحالتك (مثل حجم الأعمال السنوي، المصروفات، أو قيمة التصرف العقاري — **دون الحاجة لإدخال الرقم القومي أو رقم التسجيل الضريبي**) "
                 "لنحسب لك المسار الأوفر قانونياً ونوثّقه بشهادة إثبات رياضي من نواة `Lean 4`."
+                + sov_block
                 + rag_note
                 + f"\n\nℹ️ _{NON_BINDING_DISCLAIMER_AR}_"
             ),
             "pii_protection": pii_report,
             "ml_intent": intent_pred,
+            "data_quality_alerts": quality_alerts,
+            "sovereign_llm": sov_no_num,
             "official_legal_passages": official_rag.get("matches", []),
             "suggested_followups": followups,
             "disclaimer": NON_BINDING_DISCLAIMER_AR,
@@ -623,6 +698,42 @@ def answer_tax_question(
     comp = opt["comparison"]
     lean = opt["lean4_verification"]
     ml_intel = opt.get("ml_intelligence", {})
+
+    allowed_nums = {
+        int(profile.annual_revenue_egp),
+        int(profile.annual_expenses_egp),
+        int(profile.dispute_principal_egp),
+        int(profile.delay_penalties_egp),
+        int(profile.real_estate_sale_egp),
+        int(profile.vat_refund_claim_egp),
+        int(comp.get("optimal_annual_tax_egp", 0)),
+        int(comp.get("standard_regime_tax_egp", 0)),
+        int(comp.get("annual_income_tax_savings_egp", 0)),
+        int(comp.get("final_penalty_egp", 0)),
+        int(comp.get("raw_penalty_egp", 0)),
+        int(comp.get("total_penalty_savings_egp", 0)),
+        int(comp.get("real_estate_tax_egp", 0)),
+        int(comp.get("real_estate_savings_egp", 0)),
+        int(comp.get("total_direct_savings_egp", 0)),
+        20_000_000,
+        24_000_000,
+    }
+    locked_summary = (
+        f"Regime={comp['recommended_regime_ar']}; Turnover={profile.annual_revenue_egp:,} EGP; "
+        f"Expenses={profile.annual_expenses_egp:,} EGP; OptimalTax={comp['optimal_annual_tax_egp']:,} EGP; "
+        f"StandardTax={comp['standard_regime_tax_egp']:,} EGP; TotalSavings={comp['total_direct_savings_egp']:,} EGP; "
+        f"Lean4Proof={lean.get('proof_certificate_id', 'VERIFIED')}."
+    )
+    sov_res = generate_sovereign_advisory(
+        llm_mode=llm_mode,
+        explicit_model=llm_model,
+        user_query=redacted_msg,
+        lang=resolved_lang,
+        locked_facts_summary=locked_summary,
+        rag_passages=official_rag.get("matches", []),
+        data_quality_alerts=quality_alerts,
+        allowed_integers=allowed_nums,
+    )
 
     if resolved_lang == "en":
         en_lines: List[str] = []
@@ -670,11 +781,19 @@ def answer_tax_question(
             )
         for w_en in opt.get("deadline_warnings_en", []):
             en_lines.append(w_en)
+        for qa_en in quality_alerts:
+            en_lines.append(f"🔎 **{qa_en}**")
         en_lines.append(f"\n💰 **Total Certified Direct Savings:** **{comp['total_direct_savings_egp']:,} EGP**")
         en_lines.append(
             f"🛡️ **Lean 4.36.0 Proof Certificate:** `{lean.get('proof_certificate_id', 'N/A')}` | "
             f"**10/10 Theorems Verified (`0 sorry`)** in `{lean.get('elapsed_ms', 0)} ms`"
         )
+        if sov_res.get("enabled") and sov_res.get("advisory_text"):
+            en_lines.append(
+                f"\n🏛️ **Sovereign On-Premise Advisor (`{sov_res['model']}` — {sov_res['elapsed_ms']} ms):**\n{sov_res['advisory_text']}"
+            )
+        elif sov_res.get("fallback_reason"):
+            en_lines.append(f"\nℹ️ _{sov_res['fallback_reason']}_")
         en_lines.append(f"\nℹ️ _{NON_BINDING_DISCLAIMER_EN}_")
         return {
             "lang": "en",
@@ -683,6 +802,8 @@ def answer_tax_question(
             "reply_ar": "\n".join(en_lines),
             "pii_protection": pii_report,
             "ml_intent": intent_pred,
+            "data_quality_alerts": quality_alerts,
+            "sovereign_llm": sov_res,
             "official_legal_passages": official_rag.get("matches", []),
             "suggested_followups": followups,
             "disclaimer": NON_BINDING_DISCLAIMER_EN,
@@ -743,6 +864,9 @@ def answer_tax_question(
     for w_ar in opt.get("deadline_warnings_ar", []):
         lines.append(w_ar)
 
+    for qa_ar in quality_alerts:
+        lines.append(f"🔎 {qa_ar}")
+
     if cliff_alert:
         lines.append(cliff_alert)
 
@@ -754,6 +878,13 @@ def answer_tax_question(
         f"🛡️ **شهادة الإثبات الرياضي (Lean 4.36.0):** `{lean.get('proof_certificate_id', 'PENDING')}` "
         f"| **10/10 نظريات مُبرهَنة (`0 sorry`)** خلال `{lean.get('elapsed_ms', 0)} مللي ثانية`"
     )
+
+    if sov_res.get("enabled") and sov_res.get("advisory_text"):
+        lines.append(
+            f"\n🏛️ **تعقيب المستشار السيادي المحلي (`{sov_res['model']}` — {sov_res['elapsed_ms']} مللي ثانية):**\n{sov_res['advisory_text']}"
+        )
+    elif sov_res.get("fallback_reason"):
+        lines.append(f"\nℹ️ _{sov_res['fallback_reason']}_")
 
     if opt["roadmap_ar"]:
         lines.append("\n📋 **الخطوات الإجرائية المطلوبة:**")
@@ -777,6 +908,8 @@ def answer_tax_question(
         "ml_intent": intent_pred,
         "dialect_xray": dialect_xray,
         "cliff_edge_alert": cliff_alert,
+        "data_quality_alerts": quality_alerts,
+        "sovereign_llm": sov_res,
         "official_legal_passages": official_rag.get("matches", []),
         "suggested_followups": followups,
         "disclaimer": NON_BINDING_DISCLAIMER_AR,
