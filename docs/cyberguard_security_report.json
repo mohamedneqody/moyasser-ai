@@ -1,6 +1,6 @@
 {
-  "target": "http://127.0.0.1:8798",
-  "timestamp": "2026-11-27 11:14:21 UTC",
+  "target": "http://127.0.0.1:8080",
+  "timestamp": "2026-11-27 11:33:55 UTC",
   "session": {
     "authenticated": false,
     "method": "none"
@@ -648,7 +648,7 @@
     "rationale": "All planned attack surfaces were tested; no exploitable vulnerabilities were reproduced."
   },
   "branding": {
-    "brand_name": "Moyasser AI v2.0 - SECC Security Gate",
+    "brand_name": "Moyasser AI v2.1 - SECC Security Gate",
     "client_name": "Ministry of Finance Impact Hackathon (TAX-02)"
   }
 }

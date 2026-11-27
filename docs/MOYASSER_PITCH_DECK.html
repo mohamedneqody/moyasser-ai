@@ -3,50 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <title>العرض التقديمي الرسمي — مُيسّر الضرائب الذكي (TAX-02) | هاكاثون وزارة المالية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     @page { size: A4 landscape; margin: 0; }
     * { box-sizing: border-box; }
     body {
-      margin: 0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-      background: #050d1a; color: #f8fafc;
+      margin: 0; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+      background: #f4f7f9; color: #0f172a;
     }
     .deck-controls {
-      position: fixed; bottom: 18px; left: 24px; z-index: 100;
-      display: flex; gap: 10px; background: rgba(14, 29, 53, 0.9);
-      padding: 8px 14px; border-radius: 999px; border: 1px solid #1f3b64;
+      position: fixed; bottom: 20px; left: 24px; z-index: 100;
+      display: flex; gap: 10px; background: rgba(255, 255, 255, 0.92);
+      padding: 8px 16px; border-radius: 999px; border: 1px solid #cbd5e1;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
     }
     .deck-controls button {
-      background: #059669; color: #fff; border: none; padding: 7px 14px;
-      border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 13px;
+      background: linear-gradient(135deg, #059669, #0d9488); color: #fff; border: none;
+      padding: 8px 18px; border-radius: 999px; cursor: pointer; font-weight: 800; font-family: inherit; font-size: 13.5px;
     }
     .slide {
-      min-height: 100vh; padding: 54px 70px;
-      background: radial-gradient(circle at top left, #103258 0%, #071222 65%);
-      border-bottom: 2px solid #1e3a5f;
+      min-height: 100vh; padding: 54px 72px;
+      background: radial-gradient(900px 420px at 88% 0%, rgba(5, 150, 105, 0.10), transparent), #ffffff;
+      border-bottom: 2px solid #e2e8f0;
       display: flex; flex-direction: column; justify-content: center;
       page-break-after: always;
     }
     .badge {
       display: inline-block; align-self: flex-start;
-      background: rgba(16, 185, 129, 0.16); border: 1px solid #10b981;
-      color: #6ee7b7; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700;
+      background: #ecfdf5; border: 1px solid #a7f3d0;
+      color: #047857; padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 800;
       margin-bottom: 16px;
     }
-    h1 { font-size: 40px; margin: 0 0 14px; color: #ffffff; }
-    h2 { font-size: 30px; margin: 0 0 18px; color: #6ee7b7; }
-    p.sub { font-size: 19px; color: #cbd5e1; max-width: 920px; line-height: 1.7; }
+    h1 { font-size: 40px; margin: 0 0 12px; color: #0f172a; font-weight: 900; }
+    h2 { font-size: 29px; margin: 0 0 18px; color: #047857; font-weight: 800; }
+    p.sub { font-size: 18.5px; color: #334155; max-width: 940px; line-height: 1.75; }
     .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 22px; }
     .cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 22px; }
     .box {
-      background: rgba(14, 29, 53, 0.85); border: 1px solid #264a7d;
-      border-radius: 16px; padding: 22px;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 18px; padding: 24px;
+      box-shadow: 0 6px 20px -4px rgba(15, 23, 42, 0.05);
     }
-    .box h3 { margin: 0 0 10px; color: #fcd34d; font-size: 19px; }
-    .box p, .box li { font-size: 15px; color: #e2e8f0; line-height: 1.65; }
-    .metric { font-size: 34px; font-weight: 900; color: #34d399; margin-bottom: 6px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
-    th, td { border: 1px solid #264a7d; padding: 11px 14px; text-align: right; }
-    th { background: #102544; color: #fcd34d; }
+    .box h3 { margin: 0 0 10px; color: #b45309; font-size: 18.5px; font-weight: 800; }
+    .box p, .box li { font-size: 15px; color: #334155; line-height: 1.7; }
+    .metric { font-size: 34px; font-weight: 900; color: #059669; margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14.5px; background: #fff; border-radius: 12px; overflow: hidden; }
+    th, td { border: 1px solid #e2e8f0; padding: 11px 14px; text-align: right; }
+    th { background: #ecfdf5; color: #065f46; font-weight: 800; }
     @media print { .deck-controls { display: none; } }
   </style>
 </head>
@@ -55,7 +60,6 @@
     <button onclick="window.print()">🖨️ طباعة / حفظ العرض كملف PDF</button>
   </div>
 
-  <!-- SLIDE 1 -->
   <section class="slide">
     <span class="badge">هاكاثون الذكاء الاصطناعي في المالية العامة — وزارة المالية &amp; ITIDA / SECC | تحدي TAX-02</span>
     <h1>مُيسّر الضرائب الذكي — Moyasser AI</h1>
@@ -67,7 +71,6 @@
     </div>
   </section>
 
-  <!-- SLIDE 2 -->
   <section class="slide">
     <span class="badge">01 / المشكلة والفجوة الحالية</span>
     <h2>لماذا لا يكفي «شات بوت تقليدي» لخدمة الممولين والمستثمرين؟</h2>
@@ -87,7 +90,6 @@
     </div>
   </section>
 
-  <!-- SLIDE 3 -->
   <section class="slide">
     <span class="badge">02 / المعمارية المبتكرة رباعية الطبقات</span>
     <h2>كيف يقضي Moyasser AI على الهلوسة بنسبة 100%؟</h2>
@@ -110,7 +112,6 @@
     </div>
   </section>
 
-  <!-- SLIDE 4 -->
   <section class="slide">
     <span class="badge">03 / التوافق الكامل 100% مع كراسة شروط تحدي TAX-02</span>
     <h2>تغطية كافة متطلبات المسار الخارجي والمسار الداخلي</h2>
@@ -126,7 +127,6 @@
     </table>
   </section>
 
-  <!-- SLIDE 5 -->
   <section class="slide">
     <span class="badge">04 / النماذج المدرّبة والأثر القومي على أداء وزارة المالية</span>
     <h2>6 نماذج AI مدرّبة + جاهزية النشر الفوري والتكامل عبر REST APIs</h2>

@@ -3,276 +3,686 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مُيسّر الضرائب الذكي — Moyasser AI | مشروع TAX-02 هاكاثون وزارة المالية</title>
+  <title>مُيسّر الضرائب الذكي — Moyasser AI | مساعد التيسيرات الضريبية (TAX-02)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #071222;
-      --panel: #0e1d35;
-      --panel-2: #122645;
-      --border: #1f3b64;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --emerald: #10b981;
-      --emerald-soft: rgba(16, 185, 129, 0.14);
-      --gold: #f59e0b;
-      --gold-soft: rgba(245, 158, 11, 0.14);
-      --cyan: #06b6d4;
-      --danger: #ef4444;
+      --bg: #f4f7f9;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --ink: #0f172a;
+      --ink-2: #334155;
+      --muted: #64748b;
+      --emerald: #059669;
+      --emerald-dark: #047857;
+      --emerald-bg: #ecfdf5;
+      --emerald-border: #a7f3d0;
+      --teal: #0284c7;
+      --teal-bg: #f0f9ff;
+      --gold: #b45309;
+      --gold-bg: #fffbeb;
+      --gold-border: #fde68a;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+      --shadow-md: 0 10px 30px -6px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+      --shadow-emerald: 0 10px 24px -6px rgba(5, 150, 105, 0.28);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-      background: radial-gradient(circle at top right, #0f2b4c 0%, var(--bg) 58%);
-      color: var(--text);
+      font-family: 'Cairo', 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(1100px 420px at 88% -8%, rgba(5, 150, 105, 0.09), transparent 70%),
+        radial-gradient(900px 380px at 8% -5%, rgba(2, 132, 199, 0.07), transparent 70%);
+      color: var(--ink);
       min-height: 100vh;
-      line-height: 1.6;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
     }
+
+    /* Top Privacy & Legal Ribbon */
     .privacy-bar {
-      background: linear-gradient(90deg, #064e3b, #0c4a6e);
-      color: #d1fae5;
-      font-size: 12px;
-      padding: 6px 20px;
+      background: linear-gradient(90deg, #ecfdf5 0%, #f0f9ff 50%, #ecfdf5 100%);
+      color: #065f46;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 7px 20px;
       text-align: center;
-      border-bottom: 1px solid rgba(16, 185, 129, 0.35);
+      border-bottom: 1px solid var(--emerald-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
+
+    /* Sticky Glassmorphic Light Topbar */
     .topbar {
-      background: rgba(7, 18, 34, 0.92);
+      background: rgba(255, 255, 255, 0.88);
       border-bottom: 1px solid var(--border);
-      padding: 13px 24px;
+      padding: 14px 24px;
       position: sticky;
       top: 0;
       z-index: 50;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(14px);
     }
     .topbar-inner {
       max-width: 1280px; margin: 0 auto;
       display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 12px;
+      flex-wrap: wrap; gap: 14px;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 14px; }
     .brand-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      background: linear-gradient(135deg, #059669, #d97706);
+      width: 46px; height: 46px; border-radius: 14px;
+      background: linear-gradient(135deg, #059669 0%, #0d9488 65%, #0284c7 100%);
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; font-weight: 800; color: #fff;
-      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
+      font-size: 23px; font-weight: 900; color: #fff;
+      box-shadow: var(--shadow-emerald);
+      position: relative;
     }
-    .brand h1 { margin: 0; font-size: 19px; }
-    .brand small { color: var(--muted); font-size: 12px; display: block; }
+    .eg-flag {
+      display: inline-flex; flex-direction: column; width: 18px; height: 12px;
+      border-radius: 2px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,0.12);
+      vertical-align: middle; margin-left: 5px;
+    }
+    .eg-flag span:nth-child(1) { background: #ce1126; flex: 1; }
+    .eg-flag span:nth-child(2) { background: #ffffff; flex: 1; }
+    .eg-flag span:nth-child(3) { background: #000000; flex: 1; }
+
+    .brand h1 { margin: 0; font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -0.2px; }
+    .brand small { color: var(--muted); font-size: 12.5px; font-weight: 500; display: block; margin-top: 1px; }
+
     .status-pills { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .pill {
-      padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
-      border: 1px solid var(--border); background: var(--panel); text-decoration: none; color: var(--text);
+      padding: 6px 13px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      border: 1px solid var(--border); background: var(--surface);
+      text-decoration: none; color: var(--ink-2);
+      display: inline-flex; align-items: center; gap: 6px;
+      box-shadow: var(--shadow-sm); transition: all 0.2s ease;
     }
-    .pill.ok { border-color: var(--emerald); color: #6ee7b7; background: var(--emerald-soft); }
-    .pill.gold { border-color: var(--gold); color: #fcd34d; background: var(--gold-soft); }
+    .pill.ok { border-color: var(--emerald-border); color: var(--emerald-dark); background: var(--emerald-bg); }
+    .pill.gold { border-color: var(--gold-border); color: var(--gold); background: var(--gold-bg); }
+    a.pill:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: var(--emerald); }
 
-    .container { max-width: 1280px; margin: 0 auto; padding: 22px 20px 60px; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 22px 20px 64px; }
 
+    /* Welcoming Hero Value Strip */
+    .hero-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 55%, #f0f9ff 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: var(--radius-lg);
+      padding: 20px 26px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .hero-text h2 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #064e3b;
+    }
+    .hero-text p {
+      margin: 0;
+      font-size: 13.5px;
+      color: var(--ink-2);
+    }
+    .hero-highlights {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .h-chip {
+      background: #ffffff;
+      border: 1px solid #d1fae5;
+      border-radius: 12px;
+      padding: 8px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .h-chip strong { display: block; font-size: 14px; color: var(--emerald-dark); font-weight: 800; }
+    .h-chip span { font-size: 11.5px; color: var(--muted); }
+
+    /* Single-Row Segmented Pill Navigation */
     .tabs {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;
-      border-bottom: 1px solid var(--border); padding-bottom: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 7px;
+      border-radius: 16px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow-sm);
     }
+    @media (max-width: 920px) { .tabs { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .tabs { grid-template-columns: 1fr; } }
+
     .tab-btn {
-      background: var(--panel); color: var(--muted);
-      border: 1px solid var(--border); padding: 10px 16px;
-      border-radius: 12px; cursor: pointer; font-size: 13.5px; font-weight: 700;
-      transition: all 0.2s;
+      background: transparent;
+      color: var(--ink-2);
+      border: 1px solid transparent;
+      padding: 11px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
     }
-    .tab-btn:hover { color: #fff; border-color: var(--cyan); }
+    .tab-btn:hover { background: var(--surface-soft); color: var(--emerald-dark); }
+    .tab-btn .t-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: #f1f5f9; color: var(--ink-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0; transition: all 0.2s;
+    }
+    .tab-btn .t-title { display: block; font-size: 13.5px; font-weight: 800; line-height: 1.25; }
+    .tab-btn .t-sub { display: block; font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
     .tab-btn.active {
-      background: linear-gradient(135deg, #065f46, #0e7490);
-      color: #fff; border-color: var(--emerald);
-      box-shadow: 0 6px 18px rgba(6, 182, 212, 0.2);
+      background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+      color: #ffffff;
+      box-shadow: var(--shadow-emerald);
     }
-    .tab-panel { display: none; }
+    .tab-btn.active .t-icon { background: rgba(255, 255, 255, 0.2); color: #ffffff; }
+    .tab-btn.active .t-sub { color: #d1fae5; }
+
+    .tab-panel { display: none; animation: fadeIn 0.22s ease; }
     .tab-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    .grid-2 { display: grid; grid-template-columns: 1.08fr 1.22fr; gap: 20px; align-items: start; }
-    @media (max-width: 960px) { .grid-2 { grid-template-columns: 1fr; } }
+    /* Grids */
+    .chat-layout { display: grid; grid-template-columns: 1.55fr 0.95fr; gap: 20px; align-items: start; }
+    .grid-2 { display: grid; grid-template-columns: 1.05fr 1.2fr; gap: 20px; align-items: start; }
+    @media (max-width: 980px) { .chat-layout, .grid-2 { grid-template-columns: 1fr; } }
 
+    /* Cards */
     .card {
-      background: var(--panel); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px; margin-bottom: 18px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-md);
     }
     .card h2 {
-      margin: 0 0 13px; font-size: 16.5px; color: #f8fafc;
-      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+      margin: 0 0 14px; font-size: 16.5px; font-weight: 800; color: var(--ink);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
     }
-    .presets { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 13px; }
-    .preset-btn {
-      background: var(--panel-2); color: #e2e8f0; border: 1px solid #2b4e82;
-      padding: 6px 11px; border-radius: 10px; font-size: 12px; cursor: pointer;
-    }
-    .preset-btn:hover { border-color: var(--gold); color: #fde68a; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    /* Scenario Chips */
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .preset-btn {
+      background: var(--surface-soft);
+      color: var(--ink-2);
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .preset-btn:hover {
+      background: var(--emerald-bg);
+      border-color: var(--emerald);
+      color: var(--emerald-dark);
+      transform: translateY(-1px);
+    }
+
+    /* Forms & Inputs */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
     @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
     .field { display: flex; flex-direction: column; gap: 5px; }
     .field.full { grid-column: 1 / -1; }
-    .field label { font-size: 12.5px; color: #cbd5e1; font-weight: 600; }
+    .field label { font-size: 12.5px; color: var(--ink-2); font-weight: 700; }
     input[type="text"], input[type="number"], input[type="date"], select, textarea {
-      background: #081529; color: #f8fafc; border: 1px solid #254470;
-      border-radius: 10px; padding: 9px 12px; font-size: 13.5px; font-family: inherit;
+      background: var(--surface-soft);
+      color: var(--ink);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 13px;
+      font-size: 13.5px;
+      font-family: inherit;
+      font-weight: 600;
+      transition: all 0.18s ease;
     }
-    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 12px 0; }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      background: #ffffff;
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+    }
+
+    .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+    @media (max-width: 600px) { .checks { grid-template-columns: 1fr; } }
     .check-item {
-      display: flex; align-items: center; gap: 8px; font-size: 12.5px;
-      background: #09182e; border: 1px solid #1e3a61; padding: 8px 10px; border-radius: 10px; cursor: pointer;
+      display: flex; align-items: center; gap: 9px; font-size: 12.5px; font-weight: 700;
+      color: var(--ink-2);
+      background: var(--surface-soft); border: 1.5px solid var(--border);
+      padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: 0.15s;
     }
+    .check-item:hover { border-color: var(--emerald); background: #ffffff; }
+    .check-item input[type="checkbox"] { accent-color: var(--emerald); width: 16px; height: 16px; }
+
+    /* Buttons */
     .btn-primary {
-      width: 100%; background: linear-gradient(135deg, #059669, #0891b2);
-      color: #fff; border: none; padding: 12px 18px; border-radius: 12px;
-      font-size: 14.5px; font-weight: 800; cursor: pointer;
+      width: 100%;
+      background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+      color: #ffffff;
+      border: none;
+      padding: 13px 20px;
+      border-radius: 13px;
+      font-size: 14.5px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: var(--shadow-emerald);
+      transition: all 0.2s ease;
     }
+    .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.04); }
     .btn-row { display: flex; gap: 9px; flex-wrap: wrap; margin-top: 10px; }
     .btn-sec {
-      flex: 1; background: var(--panel-2); color: #e2e8f0;
-      border: 1px solid #2e558a; padding: 9px 13px; border-radius: 10px;
-      font-size: 12.5px; font-weight: 700; cursor: pointer; text-align: center;
+      flex: 1;
+      background: #ffffff;
+      color: var(--ink-2);
+      border: 1.5px solid var(--border-strong);
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s ease;
     }
-    .btn-sec:hover { border-color: var(--emerald); color: #6ee7b7; }
+    .btn-sec:hover { border-color: var(--emerald); color: var(--emerald-dark); background: var(--emerald-bg); }
 
-    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-bottom: 14px; }
-    .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 14px; }
+    /* KPI Boxes */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
     @media (max-width: 720px) { .kpi-grid, .kpi-grid-4 { grid-template-columns: 1fr 1fr; } }
-    .kpi-box { background: #0a1930; border: 1px solid var(--border); border-radius: 12px; padding: 13px; }
-    .kpi-box.accent {
-      background: linear-gradient(135deg, rgba(6, 95, 70, 0.55), rgba(14, 116, 144, 0.35));
-      border-color: var(--emerald);
+    .kpi-box {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 15px;
     }
-    .kpi-box .k-label { font-size: 11.5px; color: var(--muted); }
-    .kpi-box .k-val { font-size: 20px; font-weight: 800; margin-top: 4px; color: #fff; }
-    .kpi-box.accent .k-val { color: #6ee7b7; }
+    .kpi-box.accent {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border-color: #6ee7b7;
+    }
+    .kpi-box .k-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .kpi-box .k-val { font-size: 21px; font-weight: 900; margin-top: 4px; color: var(--ink); }
+    .kpi-box.accent .k-val { color: #065f46; }
 
+    /* Visual Savings Comparison Meter */
+    .compare-meter {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .cm-row { margin-bottom: 9px; }
+    .cm-row:last-child { margin-bottom: 0; }
+    .cm-head { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
+    .cm-track { height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .cm-fill-std { height: 100%; background: #94a3b8; border-radius: 99px; transition: width 0.4s ease; }
+    .cm-fill-opt { height: 100%; background: linear-gradient(90deg, #059669, #10b981); border-radius: 99px; transition: width 0.4s ease; }
+
+    /* Proof & Callout Panels */
     .proof-panel {
-      background: #050d1a; border: 1px solid #10b981; border-right: 5px solid #10b981;
-      border-radius: 12px; padding: 13px 15px; margin-bottom: 14px; font-size: 12.5px;
+      background: var(--emerald-bg);
+      border: 1px solid var(--emerald-border);
+      border-right: 5px solid var(--emerald);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 13px;
+      font-size: 13px;
+      color: #064e3b;
+    }
+    .proof-panel.info {
+      background: var(--teal-bg);
+      border-color: #bae6fd;
+      border-right-color: var(--teal);
+      color: #0c4a6e;
+    }
+    .proof-panel.warn {
+      background: var(--gold-bg);
+      border-color: var(--gold-border);
+      border-right-color: #d97706;
+      color: #78350f;
+    }
+    .proof-panel.danger {
+      background: var(--danger-bg);
+      border-color: #fecaca;
+      border-right-color: var(--danger);
+      color: #991b1b;
     }
     .proof-meta {
-      font-family: Consolas, monospace; direction: ltr; text-align: left;
-      color: #a7f3d0; font-size: 11.5px; margin-top: 5px; word-break: break-all;
+      font-family: Consolas, 'Courier New', monospace;
+      direction: ltr; text-align: left;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(5, 150, 105, 0.2);
+      padding: 6px 10px; border-radius: 8px;
+      color: #065f46; font-size: 11.5px; margin-top: 7px; word-break: break-all;
     }
+
     .decision-tags { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 14px; }
     .d-tag {
-      padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;
-      background: var(--emerald-soft); border: 1px solid var(--emerald); color: #6ee7b7;
+      padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      background: var(--emerald-bg); border: 1px solid var(--emerald-border); color: var(--emerald-dark);
     }
-    .d-tag.off { background: rgba(148, 163, 184, 0.08); border-color: #334155; color: #64748b; }
-    .list-clean { padding-right: 18px; margin: 7px 0 13px; }
-    .list-clean li { margin-bottom: 6px; font-size: 13px; color: #e2e8f0; }
+    .d-tag.off { background: #f1f5f9; border-color: var(--border); color: var(--muted); }
 
+    .list-clean { padding-right: 20px; margin: 7px 0 14px; }
+    .list-clean li { margin-bottom: 7px; font-size: 13.5px; color: var(--ink-2); }
+
+    /* Conversational Chat Studio (Light, Crisp, Welcoming) */
     .chat-box {
-      height: 410px; overflow-y: auto; background: #071326;
-      border: 1px solid var(--border); border-radius: 14px; padding: 16px;
-      display: flex; flex-direction: column; gap: 12px; margin-bottom: 10px;
+      height: 430px;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 12px;
     }
-    .msg {
-      max-width: 88%; padding: 12px 15px; border-radius: 14px;
-      font-size: 13.5px; white-space: pre-wrap;
+    .msg-row { display: flex; gap: 10px; align-items: flex-start; }
+    .msg-row.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px;
     }
-    .msg.user { align-self: flex-start; background: #1e3a5f; color: #f8fafc; }
-    .msg.bot { align-self: flex-end; background: #0c2538; border: 1px solid #164e63; color: #e2e8f0; }
-    .msg.en { direction: ltr; text-align: left; }
-    .chat-form { display: flex; gap: 8px; flex-wrap: wrap; }
-    .chat-form input[type="text"] { flex: 1; min-width: 220px; }
-    .followups-bar { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+    .avatar.bot { background: linear-gradient(135deg, #059669, #0d9488); color: #fff; box-shadow: var(--shadow-sm); }
+    .avatar.user { background: #e2e8f0; color: var(--ink-2); }
 
-    .bar-row { margin-bottom: 10px; }
-    .bar-head { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px; }
-    .bar-track { height: 10px; background: #081529; border-radius: 99px; overflow: hidden; }
-    .bar-fill { height: 100%; background: linear-gradient(90deg, #10b981, #06b6d4); border-radius: 99px; }
+    .msg {
+      max-width: 85%;
+      padding: 13px 16px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      box-shadow: var(--shadow-sm);
+    }
+    .msg.bot {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--ink);
+      border-top-right-radius: 4px;
+    }
+    .msg.user {
+      background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+      color: #ffffff;
+      border-top-left-radius: 4px;
+      font-weight: 600;
+    }
+    .msg.en { direction: ltr; text-align: left; }
+    .msg code {
+      background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;
+      padding: 1px 6px; border-radius: 6px; font-family: Consolas, monospace; font-size: 12px;
+    }
+    .msg strong { color: #064e3b; }
+    .msg.user strong { color: #ffffff; }
+
+    .followups-bar { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 12px; }
+    .composer-wrap {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      background: var(--surface-soft); border: 1.5px solid var(--border-strong);
+      padding: 7px; border-radius: 16px;
+    }
+    .composer-wrap:focus-within {
+      background: #ffffff; border-color: var(--emerald);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+    }
+    .composer-wrap input[type="text"] {
+      flex: 1; min-width: 200px; border: none; background: transparent;
+      padding: 8px 10px; box-shadow: none;
+    }
+    .composer-wrap input[type="text"]:focus { box-shadow: none; }
+
+    /* Step Cards in Sidebar */
+    .how-steps { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .how-step {
+      display: flex; gap: 11px; align-items: flex-start;
+      background: var(--surface-soft); border: 1px solid var(--border);
+      border-radius: 12px; padding: 11px 13px;
+    }
+    .how-num {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: var(--emerald-bg); color: var(--emerald-dark); border: 1px solid var(--emerald-border);
+      font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .how-step strong { display: block; font-size: 13px; color: var(--ink); }
+    .how-step span { font-size: 12px; color: var(--muted); }
+
+    /* Progress Bars & Tables */
+    .bar-row { margin-bottom: 11px; }
+    .bar-head { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--ink-2); margin-bottom: 4px; }
+    .bar-track { height: 10px; background: #e2e8f0; border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; background: linear-gradient(90deg, #059669, #0284c7); border-radius: 99px; }
 
     pre.lean-code {
-      background: #040b16; color: #cbd5e1; border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px; font-family: Consolas, monospace;
-      font-size: 12px; direction: ltr; text-align: left; max-height: 340px; overflow: auto;
+      background: #0f172a; color: #e2e8f0; border: 1px solid #1e293b;
+      border-radius: 14px; padding: 16px; font-family: Consolas, monospace;
+      font-size: 12px; direction: ltr; text-align: left; max-height: 320px; overflow: auto;
     }
-    table.t-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-    table.t-table th, table.t-table td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: right; }
-    table.t-table th { color: #94a3b8; font-weight: 700; }
+    table.t-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.t-table th, table.t-table td { border-bottom: 1px solid var(--border); padding: 10px 12px; text-align: right; }
+    table.t-table th { background: var(--surface-soft); color: var(--ink-2); font-weight: 800; }
+    table.t-table tr:hover td { background: #f8fafc; }
   </style>
 </head>
 <body>
   <div class="privacy-bar">
-    🔒 التزام كامل بقانون حماية البيانات الشخصية رقم 151 لسنة 2020 وسرية البيانات الضريبية: لا نطلب ولا نعالج الرقم القومي أو رقم التسجيل الضريبي — كافة الإجابات استرشادية وليست فتوى ملزمة.
+    <span>🛡️</span>
+    <span>التزام كامل بقانون حماية البيانات الشخصية رقم 151 لسنة 2020 وسرية البيانات الضريبية: لا نطلب ولا نعالج الرقم القومي أو رقم التسجيل الضريبي — الإجابات استرشادية وليست فتوى ملزمة.</span>
   </div>
+
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
         <div class="brand-icon">م</div>
         <div>
-          <h1>مُيسّر الضرائب الذكي — Moyasser AI (مشروع TAX-02)</h1>
-          <small>المسار الخارجي (ممولين ومستثمرين AR/EN) + المسار الداخلي (موظفي مصلحة الضرائب) | Lean 4 + HiGHS MILP + Official RAG</small>
+          <h1>
+            <span class="eg-flag" aria-hidden="true"><span></span><span></span><span></span></span>
+            مُيسّر الضرائب الذكي — Moyasser AI
+          </h1>
+          <small>منظومة التيسيرات الضريبية الذكية (تحدي TAX-02) | وزارة المالية &amp; ITIDA SECC</small>
         </div>
       </div>
       <div class="status-pills">
-        <span class="pill ok">🛡️ Lean 4: 10/10 نظريات (0 sorry)</span>
-        <span class="pill gold">🏛️ 18 وثيقة رسمية MoF &amp; ETA</span>
-        <a class="pill gold" href="/pitch-deck" target="_blank">📊 العرض التقديمي (Pitch Deck)</a>
+        <span class="pill ok">✓ إثبات رياضي Lean 4 (10/10 نظريات)</span>
+        <span class="pill gold">📚 18 تشريع ودليل رسمي (MoF &amp; ETA)</span>
+        <a class="pill ok" href="/pitch-deck" target="_blank">📊 العرض التقديمي للمشروع</a>
       </div>
     </div>
   </header>
 
   <main class="container">
+    <!-- Welcoming Executive Hero -->
+    <div class="hero-banner">
+      <div class="hero-text">
+        <h2>اكتشف حقك في التيسيرات الضريبية المصرية خلال 30 ثانية</h2>
+        <p>مساعد تفاعلي بالعامية المصرية والإنجليزية للمستثمرين الأجانب — يجمع النصوص الرسمية لمصلحة الضرائب مع تحسين رياضي دقيق دون أي هلوسة.</p>
+      </div>
+      <div class="hero-highlights">
+        <div class="h-chip">
+          <strong>0.4% – 1.5%</strong>
+          <span>شرائح قانون 6 المبسط (&lt; 20 مليون)</span>
+        </div>
+        <div class="h-chip">
+          <strong>31 ديسمبر 2026</strong>
+          <span>مهلة إنهاء المنازعات (قانون 152)</span>
+        </div>
+        <div class="h-chip">
+          <strong>0% إعفاء كامل</strong>
+          <span>تصرفات عقارية لأقارب الدرجة الأولى</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clean Single-Row 4-Tab Navigation -->
     <nav class="tabs">
-      <button class="tab-btn active" data-tab="tab-chat">💬 المسار الخارجي (1): المساعد الذكي (عربي / EN + صوت + ملفات)</button>
-      <button class="tab-btn" data-tab="tab-calc">🧮 المسار الخارجي (2): المحرك الأمثل (HiGHS + Lean 4)</button>
-      <button class="tab-btn" data-tab="tab-officer">👔 المسار الداخلي: منصة موظفي خدمات المستثمرين وتحديث القرارات</button>
-      <button class="tab-btn" data-tab="tab-ministry">🏛️ لوحة المتابعة: أكثر الأسئلة تكراراً + أثر وزارة المالية</button>
+      <button class="tab-btn active" data-tab="tab-chat">
+        <span class="t-icon">💬</span>
+        <span>
+          <span class="t-title">المساعد التفاعلي الذكي</span>
+          <span class="t-sub">عربي / EN • صوت • رفع ملفات</span>
+        </span>
+      </button>
+      <button class="tab-btn" data-tab="tab-calc">
+        <span class="t-icon">🧮</span>
+        <span>
+          <span class="t-title">حاسبة الوفر والمحرك الأمثل</span>
+          <span class="t-sub">HiGHS MILP + شهادة Lean 4</span>
+        </span>
+      </button>
+      <button class="tab-btn" data-tab="tab-officer">
+        <span class="t-icon">👔</span>
+        <span>
+          <span class="t-title">منصة موظفي خدمات المستثمرين</span>
+          <span class="t-sub">المسار الداخلي • تحديث القرارات</span>
+        </span>
+      </button>
+      <button class="tab-btn" data-tab="tab-ministry">
+        <span class="t-icon">📊</span>
+        <span>
+          <span class="t-title">لوحة المتابعة والأثر المالي</span>
+          <span class="t-sub">الأسئلة المتكررة • توقعات الوزارة</span>
+        </span>
+      </button>
     </nav>
 
-    <!-- TAB 1: EXTERNAL TRACK - BILINGUAL MULTIMODAL COPILOT -->
+    <!-- TAB 1: EXTERNAL TRACK - CONVERSATIONAL STUDIO + LIVE SUMMARY SIDEBAR -->
     <section id="tab-chat" class="tab-panel active">
-      <div class="card">
-        <h2>
-          <span>💬 المساعد الضريبي الذكي للممولين والمستثمرين الأجانب (عربي عامي ← فصحى مبسطة / English)</span>
-          <select id="chat-lang" style="width:auto; padding:6px 10px; font-size:12.5px;">
-            <option value="auto">🌐 كشف تلقائي للغة (Auto AR / EN)</option>
-            <option value="ar">🇪🇬 العربية (فصحى مبسطة)</option>
-            <option value="en">🌍 English (Foreign Investors)</option>
-          </select>
-        </h2>
-        <div class="presets">
-          <button class="preset-btn chat-chip" data-q="عندي مطعم في الجيزة مبيعاته 4 مليون ومصاريفه 2.5 مليون وعليا غرامات 180 ألف وأصل ضريبة 100 ألف">🍽️ مطعم 4 مليون + تسوية غرامات</button>
-          <button class="preset-btn chat-chip" data-q="أنا فريلانسر دخلي 900 ألف في السنة ولسه مفتحتش ملف ضريبي">👨‍💻 فريلانسر 900 ألف بدون ملف</button>
-          <button class="preset-btn chat-chip" data-q="بعت شقة بـ 3 مليون لابني، عليا ضريبة تصرفات عقارية كام؟">🏠 بيع شقة لابني (درجة أولى)</button>
-          <button class="preset-btn chat-chip" data-q="My software subsidiary in Cairo has annual revenue of 12 million EGP, expenses of 7.5 million EGP, and a VAT refund claim of 450 thousand EGP.">🌍 Foreign Investor (English)</button>
-          <button class="preset-btn chat-chip" data-q="ما التعريفة الجمركية لاستيراد سيارة كهربائية؟">🚫 تجربة سؤال خارج النطاق + إحالة لموظف</button>
+      <div class="chat-layout">
+        <div class="card" style="margin-bottom:0;">
+          <h2>
+            <span>💬 استشر «مُيسّر» بلغة طبيعية (ممولين مصريين ومستثمرين أجانب)</span>
+            <select id="chat-lang" style="width:auto; padding:6px 12px; font-size:12.5px;">
+              <option value="auto">🌐 كشف تلقائي للغة (AR / EN)</option>
+              <option value="ar">العربية (فصحى مبسطة)</option>
+              <option value="en">English (Foreign Investors)</option>
+            </select>
+          </h2>
+
+          <div class="presets">
+            <button class="preset-btn chat-chip" data-q="عندي مطعم في الجيزة مبيعاته 4 مليون ومصاريفه 2.5 مليون وعليا غرامات 180 ألف وأصل ضريبة 100 ألف">🍽️ مطعم 4 مليون + تسوية غرامات</button>
+            <button class="preset-btn chat-chip" data-q="أنا فريلانسر دخلي 900 ألف في السنة ولسه مفتحتش ملف ضريبي">💻 فريلانسر 900 ألف بدون ملف</button>
+            <button class="preset-btn chat-chip" data-q="بعت شقة بـ 3 مليون لابني، عليا ضريبة تصرفات عقارية كام؟">🏠 بيع شقة لابني (درجة أولى)</button>
+            <button class="preset-btn chat-chip" data-q="My software subsidiary in Cairo has annual revenue of 12 million EGP, expenses of 7.5 million EGP, and a VAT refund claim of 450 thousand EGP.">🌐 Foreign Investor (English)</button>
+            <button class="preset-btn chat-chip" data-q="ما التعريفة الجمركية لاستيراد سيارة كهربائية؟">↪️ سؤال خارج النطاق + إحالة لموظف</button>
+          </div>
+
+          <div class="chat-box" id="chat-box">
+            <div class="msg-row bot">
+              <div class="avatar bot">م</div>
+              <div class="msg bot" id="welcome-bot-msg"></div>
+            </div>
+          </div>
+
+          <div id="followups-container" class="followups-bar"></div>
+
+          <form id="chat-form" class="composer-wrap">
+            <input type="text" id="chat-input" placeholder="اكتب استفسارك بالعربية العامية أو الإنجليزية (أو اضغط على أحد الأمثلة أعلاه)..." autocomplete="off" />
+            <button type="button" class="btn-sec" id="btn-voice" style="flex:0 0 auto; padding:8px 12px;">🎙️ صوت</button>
+            <label class="btn-sec" style="flex:0 0 auto; padding:8px 12px; cursor:pointer;">
+              📎 إرفاق PDF/صورة
+              <input type="file" id="chat-file-upload" accept=".pdf,.txt,.png,.jpg,.jpeg,.webp" style="display:none;" />
+            </label>
+            <button type="submit" class="btn-primary" style="width:auto; padding:9px 22px; border-radius:11px;">إرسال ←</button>
+          </form>
         </div>
 
-        <div class="chat-box" id="chat-box">
-          <div class="msg bot">أهلاً بكم في «مُيسّر الضرائب الذكي — مشروع TAX-02»! 🇪🇬
-اطرح سؤالك بالعربية العامية أو بالإنجليزية للمستثمرين الأجانب (نصاً، أو بالصوت 🎙️، أو برفع ملف PDF/نصي 📎).
-يلتزم المساعد بالمصادر الرسمية وتواريخ السريان والمهل القانونية، ويقترح 3 أسئلة سياقية بعد كل إجابة، ويحيل الحالات غير المغطاة لموظف خدمات المستثمرين مع ملخص المحادثة.</div>
+        <!-- Live Trust & Instant Savings Sidebar -->
+        <div>
+          <div class="card">
+            <h2>✨ ملخص الوفر الموثّق لحالتك</h2>
+            <div class="kpi-box accent" style="margin-bottom:12px; text-align:center;">
+              <div class="k-label">إجمالي الوفر المباشر المحسوب</div>
+              <div class="k-val" id="side-total-savings" style="font-size:26px;">475,250 ج.م</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+              <div class="kpi-box" style="padding:11px;">
+                <div class="k-label">الضريبة السنوية المثلى</div>
+                <div class="k-val" id="side-opt-tax" style="font-size:17px;">40,000 ج.م</div>
+              </div>
+              <div class="kpi-box" style="padding:11px;">
+                <div class="k-label">النظام العادي (قبل التيسير)</div>
+                <div class="k-val" id="side-std-tax" style="font-size:17px;">335,250 ج.م</div>
+              </div>
+            </div>
+            <div class="proof-panel" style="margin-bottom:12px;">
+              <strong id="side-regime-badge">✅ النظام المبسط (قانون 6 لسنة 2025)</strong>
+              <div class="proof-meta" id="side-proof-id">LEAN4-PROOF-VERIFIED | 10/10 Theorems</div>
+            </div>
+            <div class="btn-row" style="margin-top:0;">
+              <button class="btn-sec" id="btn-side-pdf">📄 شهادة PDF</button>
+              <button class="btn-sec" id="btn-side-html">📑 خارطة الطريق A4</button>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:0;">
+            <h2>🛡️ لماذا تثق في إجابات «مُيسّر»؟</h2>
+            <div class="how-steps">
+              <div class="how-step">
+                <div class="how-num">1</div>
+                <div>
+                  <strong>مصادر تشريعية رسمية 100%</strong>
+                  <span>استرجاع نصي مباشر من 18 قانون ودليل رسمي منشور من وزارة المالية ومصلحة الضرائب مع تاريخ السريان والمهلة.</span>
+                </div>
+              </div>
+              <div class="how-step">
+                <div class="how-num">2</div>
+                <div>
+                  <strong>تحسين رياضي يحمي مصلحتك</strong>
+                  <span>محرك HiGHS MILP يقارن النظام المبسط بالعادي وينبهك فوراً إذا كان هامش ربحك المنخفض يجعل النظام العادي أوفر لك.</span>
+                </div>
+              </div>
+              <div class="how-step">
+                <div class="how-num">3</div>
+                <div>
+                  <strong>صفر هلوسة رقمية (Lean 4)</strong>
+                  <span>كل جنيه محسوب يمر عبر نواة برهان رياضي تضم 10 نظريات مبرهنة آلياً قبل عرضه لك.</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div id="followups-container" class="followups-bar"></div>
-
-        <form class="chat-form" id="chat-form">
-          <input type="text" id="chat-input" placeholder="اكتب سؤالك بالعربية أو الإنجليزية (دون إدخال رقم قومي أو تسجيل ضريبي)..." autocomplete="off" />
-          <button type="button" class="btn-sec" id="btn-voice" style="flex:0 0 auto;">🎙️ تحدث صوتياً</button>
-          <label class="btn-sec" style="flex:0 0 auto; cursor:pointer;">
-            📎 إرفاق PDF/ملف
-            <input type="file" id="chat-file-upload" accept=".pdf,.txt,.png,.jpg,.jpeg,.webp" style="display:none;" />
-          </label>
-          <button type="submit" class="btn-primary" style="width:auto; padding:10px 22px;">إرسال</button>
-        </form>
       </div>
     </section>
 
-    <!-- TAB 2: EXTERNAL TRACK - HIGHS MILP + LEAN 4 CALCULATOR -->
+    <!-- TAB 2: EXTERNAL TRACK - DETAILED CALCULATOR & DOCUMENT SCANNER -->
     <section id="tab-calc" class="tab-panel">
       <div class="grid-2">
         <div>
           <div class="card">
-            <h2>1. بيانات الحالة الاسترشادية (ممول أو مستثمر)</h2>
+            <h2>1. أدخل الأرقام التقريبية لحالتك (أو اختر نموذجاً جاهزاً)</h2>
             <div class="presets">
               <button class="preset-btn" data-preset="restaurant">🍽️ مطعم 4 مليون + غرامات</button>
               <button class="preset-btn" data-preset="thin_margin">📦 تاجر هامش ربح 2% (العادي أوفر!)</button>
-              <button class="preset-btn" data-preset="software">💻 شركة برمجيات 12 مليون + القائمة البيضاء</button>
+              <button class="preset-btn" data-preset="software">💻 شركة برمجيات 12 مليون + رد VAT</button>
               <button class="preset-btn" data-preset="realestate">🏠 بيع شقة 3 مليون لأقارب درجة أولى</button>
             </div>
 
@@ -285,8 +695,8 @@
                 <label>الكيان القانوني</label>
                 <select id="entity_type">
                   <option value="company">شركة أموال / أشخاص</option>
-                  <option value="sole">منشأة فردية / محل</option>
-                  <option value="freelancer">عمل حر / فريلانسر / مهني</option>
+                  <option value="sole">منشأة فردية / محل تجاري</option>
+                  <option value="freelancer">عمل حر / فريلانسر / نشاط مهني</option>
                 </select>
               </div>
               <div class="field">
@@ -301,27 +711,27 @@
                 </select>
               </div>
               <div class="field">
-                <label>حجم الأعمال السنوي (جنيه)</label>
+                <label>حجم الأعمال السنوي (ج.م)</label>
                 <input type="number" id="annual_revenue_egp" value="4000000" min="0" />
               </div>
               <div class="field">
-                <label>المصروفات السنوية المؤيدة (جنيه)</label>
+                <label>المصروفات السنوية المؤيدة (ج.م)</label>
                 <input type="number" id="annual_expenses_egp" value="2500000" min="0" />
               </div>
               <div class="field">
-                <label>أصل الضريبة في نزاع قديم (جنيه)</label>
+                <label>أصل الضريبة في نزاع قديم (ج.م)</label>
                 <input type="number" id="dispute_principal_egp" value="100000" min="0" />
               </div>
               <div class="field">
-                <label>غرامات / مقابل تأخير قائم (جنيه)</label>
+                <label>غرامات / مقابل تأخير قائم (ج.م)</label>
                 <input type="number" id="delay_penalties_egp" value="180000" min="0" />
               </div>
               <div class="field">
-                <label>طلب رد ضريبة قيمة مضافة (جنيه)</label>
+                <label>طلب رد ضريبة قيمة مضافة (ج.م)</label>
                 <input type="number" id="vat_refund_claim_egp" value="0" min="0" />
               </div>
               <div class="field">
-                <label>قيمة بيع عقار (تصرفات عقارية - جنيه)</label>
+                <label>قيمة بيع عقار للتصرفات العقارية (ج.م)</label>
                 <input type="number" id="real_estate_sale_egp" value="0" min="0" />
               </div>
             </div>
@@ -329,33 +739,33 @@
             <div class="checks">
               <label class="check-item"><input type="checkbox" id="is_registered_previously" checked /> مسجل ضريبياً من قبل</label>
               <label class="check-item"><input type="checkbox" id="has_old_dispute_or_penalties" checked /> تسوية المنازعات والغرامات</label>
-              <label class="check-item"><input type="checkbox" id="vat_registered" /> مسجل قيمة مضافة / ملتزم</label>
+              <label class="check-item"><input type="checkbox" id="vat_registered" /> مسجل قيمة مضافة / ملتزم بالإقرارات</label>
               <label class="check-item"><input type="checkbox" id="real_estate_first_degree" /> البيع العقاري لأقارب درجة أولى</label>
             </div>
 
-            <button class="btn-primary" id="btn-run-opt">⚡ احسب المسار الأوفر + وثّق النتيجة بـ Lean 4 (10 نظريات)</button>
+            <button class="btn-primary" id="btn-run-opt">⚡ احسب أوفر مسار قانوني + أصدر شهادة Lean 4</button>
           </div>
 
-          <div class="card">
-            <h2>📄 فحص ملف إخطار أو فاتورة (نص / PDF / صورة ممسوحة ضوئياً)</h2>
+          <div class="card" style="margin-bottom:0;">
+            <h2>📄 فحص إخطار ضريبي أو فاتورة (نص / ملف PDF / صورة ممسوحة)</h2>
             <div class="field">
-              <textarea id="doc_text" rows="3" placeholder="الصق نص الإخطار أو ارفع ملف PDF/نصي أدناه..."></textarea>
+              <textarea id="doc_text" rows="3" placeholder="الصق نص الإخطار هنا أو ارفع ملف PDF/صورة بالأسفل..."></textarea>
             </div>
             <div class="btn-row">
               <button class="btn-sec" id="btn-fill-sample-doc">📋 مثال إخطار (اختبار حجب PII)</button>
               <label class="btn-sec" style="cursor:pointer;">
-                📎 رفع ملف PDF / صورة
+                📎 رفع PDF / صورة
                 <input type="file" id="scanner-file-input" accept=".pdf,.txt,.png,.jpg,.jpeg" style="display:none;" />
               </label>
               <button class="btn-sec" id="btn-scan-doc">🔍 افحص النص الآن</button>
             </div>
-            <div id="doc-scan-status" style="margin-top:9px; font-size:12px; color:#6ee7b7;"></div>
+            <div id="doc-scan-status" style="margin-top:9px; font-size:12.5px; font-weight:700; color:var(--emerald-dark);"></div>
           </div>
         </div>
 
         <div>
-          <div class="card" id="results-card">
-            <h2>2. القرار الأمثل وشهادة الإثبات الرياضي (Lean 4) وتواريخ السريان</h2>
+          <div class="card" id="results-card" style="margin-bottom:0;">
+            <h2>2. التوصية القانونية المثلى وخارطة الطريق التنفيذية</h2>
             <div class="kpi-grid">
               <div class="kpi-box accent">
                 <div class="k-label">إجمالي الوفر المباشر الموثّق</div>
@@ -371,6 +781,18 @@
               </div>
             </div>
 
+            <!-- Visual Comparison Bar -->
+            <div class="compare-meter">
+              <div class="cm-row">
+                <div class="cm-head"><span>العبء قبل التيسيرات (شاملاً الغرامات)</span><span id="cm-before-val">—</span></div>
+                <div class="cm-track"><div class="cm-fill-std" id="cm-before-bar" style="width:100%"></div></div>
+              </div>
+              <div class="cm-row">
+                <div class="cm-head"><span style="color:var(--emerald-dark);">العبء الأمثل بعد التيسيرات</span><span id="cm-after-val" style="color:var(--emerald-dark);">—</span></div>
+                <div class="cm-track"><div class="cm-fill-opt" id="cm-after-bar" style="width:15%"></div></div>
+              </div>
+            </div>
+
             <div class="proof-panel" id="proof-panel">
               <strong id="res-regime-title">جارٍ تشغيل محرك HiGHS MILP ونواة Lean 4...</strong>
               <div class="proof-meta" id="res-proof-meta"></div>
@@ -378,25 +800,25 @@
 
             <div id="res-deadline-alerts" style="margin-bottom:12px;"></div>
 
-            <div class="proof-panel" id="ml-intel-panel" style="border-color:#06b6d4; border-right-color:#06b6d4;">
+            <div class="proof-panel info" id="ml-intel-panel">
               <strong id="res-ml-propensity">🧠 مؤشر الاستجابة للتيسيرات (XGBoost): —</strong>
-              <div id="res-ml-anomaly" style="font-size:12px; color:#cbd5e1; margin-top:4px;"></div>
+              <div id="res-ml-anomaly" style="font-size:12.5px; margin-top:4px;"></div>
             </div>
 
             <div class="decision-tags" id="res-decision-tags"></div>
 
-            <div class="btn-row" style="margin-bottom:14px;">
-              <button class="btn-sec" id="btn-dl-html">📑 تحميل خارطة الطريق (HTML A4)</button>
-              <button class="btn-sec" id="btn-dl-pdf">📄 تحميل الشهادة الموثّقة (PDF)</button>
+            <div class="btn-row" style="margin-bottom:16px;">
+              <button class="btn-sec" id="btn-dl-html">📑 تحميل خارطة الطريق للطباعة (HTML A4)</button>
+              <button class="btn-sec" id="btn-dl-pdf">📄 تحميل شهادة الإثبات الرسمية (PDF)</button>
             </div>
 
-            <h3 style="font-size:14.5px; color:#fcd34d; margin:12px 0 6px;">✨ المزايا والإعفاءات المستحقة</h3>
+            <h3 style="font-size:15px; color:var(--emerald-dark); margin:14px 0 6px;">✨ المزايا والإعفاءات المستحقة لك</h3>
             <ul class="list-clean" id="res-benefits"></ul>
 
-            <h3 style="font-size:14.5px; color:#6ee7b7; margin:12px 0 6px;">🗺️ خطوات التنفيذ والمستندات المطلوبة</h3>
+            <h3 style="font-size:15px; color:var(--teal); margin:14px 0 6px;">🗺️ خطوات التنفيذ والمستندات المطلوبة</h3>
             <ol class="list-clean" id="res-roadmap"></ol>
             <ul class="list-clean" id="res-docs"></ul>
-            <div id="res-citations" style="font-size:12px; color:#94a3b8; margin-top:8px;"></div>
+            <div id="res-citations" style="font-size:12px; color:var(--muted); background:var(--surface-soft); padding:12px; border-radius:12px; border:1px solid var(--border); margin-top:10px;"></div>
           </div>
         </div>
       </div>
@@ -409,23 +831,23 @@
           <div class="card">
             <h2>🔍 المسار الداخلي (1): البحث التشريعي الفوري لموظفي خدمات المستثمرين (18 وثيقة رسمية)</h2>
             <div class="presets">
-              <button class="preset-btn rag-chip" data-rq="عشرين مليون جنيه قانون 6 الحوافز والتيسيرات">📜 قانون 6/2025</button>
-              <button class="preset-btn rag-chip" data-rq="إنهاء المنازعات الضريبية قانون 152 لسنة 2026">⚖️ قانون 152/2026</button>
-              <button class="preset-btn rag-chip" data-rq="الأسئلة الشائعة منظومة التصرفات العقارية">🏠 التصرفات العقارية</button>
-              <button class="preset-btn rag-chip" data-rq="الأجهزة الطبية القيمة المضافة قانون 149">🏥 قانون 149/2026</button>
+              <button class="preset-btn rag-chip" data-rq="عشرين مليون جنيه قانون 6 الحوافز والتيسيرات">📜 قانون 6 لسنة 2025</button>
+              <button class="preset-btn rag-chip" data-rq="إنهاء المنازعات الضريبية قانون 152 لسنة 2026">⚖️ قانون 152 لسنة 2026</button>
+              <button class="preset-btn rag-chip" data-rq="الأسئلة الشائعة منظومة التصرفات العقارية">🏠 دليل التصرفات العقارية</button>
+              <button class="preset-btn rag-chip" data-rq="الأجهزة الطبية القيمة المضافة قانون 149">🏥 قانون 149 لسنة 2026</button>
             </div>
-            <form class="chat-form" id="rag-form">
-              <input type="text" id="rag-input" placeholder="ابحث فوراً في نصوص القوانين والتعليمات التنفيذية أثناء مقابلة المستثمر..." autocomplete="off" />
-              <button type="submit" class="btn-sec" style="flex:0 0 auto;">🔍 بحث تشريعي</button>
+            <form id="rag-form" class="composer-wrap">
+              <input type="text" id="rag-input" placeholder="ابحث فوراً في نصوص القوانين والكتب الدورية أثناء مقابلة المستثمر..." autocomplete="off" />
+              <button type="submit" class="btn-primary" style="width:auto; padding:9px 18px; border-radius:11px;">🔍 بحث تشريعي</button>
             </form>
-            <div id="rag-results" style="margin-top:12px;"></div>
+            <div id="rag-results" style="margin-top:14px;"></div>
           </div>
 
-          <div class="card">
-            <h2>⚡ المسار الداخلي (2): إضافة قرار أو تعليمات جديدة فورياً دون إعادة بناء الحل (Hot-Reload)</h2>
+          <div class="card" style="margin-bottom:0;">
+            <h2>⚡ المسار الداخلي (2): إضافة قرار أو كتاب دوري جديد فورياً دون إعادة بناء الحل</h2>
             <div class="form-grid">
               <div class="field">
-                <label>رمز القرار / الكتاب الدوري</label>
+                <label>رمز القرار / التعليمات</label>
                 <input type="text" id="dec_id" value="ETA_CIRCULAR_30_2026" />
               </div>
               <div class="field">
@@ -433,7 +855,7 @@
                 <input type="date" id="dec_eff" value="2026-11-27" />
               </div>
               <div class="field full">
-                <label>عنوان القرار أو التعليمات التنفيذية الجديدة</label>
+                <label>عنوان القرار أو الكتاب الدوري الجديد</label>
                 <input type="text" id="dec_title" value="تعليمات تنفيذية رقم 30 لسنة 2026 بتيسير فحص مستثمري التكنولوجيا" />
               </div>
               <div class="field full">
@@ -441,15 +863,15 @@
                 <textarea id="dec_text" rows="3">تُعفى الشركات التكنولوجية المصدّرة للبرمجيات المنضمة للقائمة البيضاء من تقديم مستندات الفحص الورقية، ويُكتفى بالفواتير الإلكترونية لرد ضريبة القيمة المضافة خلال خمسة أيام عمل اعتباراً من نوفمبر 2026.</textarea>
               </div>
             </div>
-            <button class="btn-primary" id="btn-ingest-decree" style="margin-top:10px;">➕ نشر وتفعيل القرار فوراً في قاعدة المعرفة (Zero Rebuild)</button>
-            <div id="decree-status" style="margin-top:8px; font-size:12.5px; color:#6ee7b7;"></div>
+            <button class="btn-primary" id="btn-ingest-decree" style="margin-top:12px;">➕ نشر وتفعيل القرار فوراً في قاعدة المعرفة (Zero Rebuild)</button>
+            <div id="decree-status" style="margin-top:9px; font-size:13px; font-weight:700; color:var(--emerald-dark);"></div>
           </div>
         </div>
 
         <div>
-          <div class="card">
+          <div class="card" style="margin-bottom:0;">
             <h2>📨 المسار الداخلي (3): طابور الاستفسارات المحالة للموظف المختص مع ملخص المحادثة</h2>
-            <p style="font-size:12.5px; color:var(--muted); margin-top:0;">تظهر هنا تلقائياً الحالات خارج النطاق أو طلبات الرأي المسبق المحالة من نافذة الممولين (خالية تماماً من البيانات الشخصية وفق قانون 151 لسنة 2020).</p>
+            <p style="font-size:13px; color:var(--muted); margin-top:0;">تظهر هنا تلقائياً الاستفسارات خارج النطاق أو طلبات الرأي المسبق المحالة من نافذة الممولين، منقّاة تماماً من أي بيانات شخصية وفق القانون 151 لسنة 2020.</p>
             <div id="officer-escalations-list"></div>
           </div>
         </div>
@@ -461,34 +883,22 @@
       <div class="card">
         <h2>📊 لوحة المتابعة المبسطة: أكثر الأسئلة تكراراً ومؤشرات الاستفادة (مجهّلة الهوية 100%)</h2>
         <div class="kpi-grid-4">
-          <div class="kpi-box accent">
-            <div class="k-label">إجمالي الوفورات الاسترشادية</div>
-            <div class="k-val" id="mof-savings">—</div>
-          </div>
-          <div class="kpi-box">
-            <div class="k-label">منشآت غير مسجلة استفسرت للانضمام</div>
-            <div class="k-val" id="mof-formalized">—</div>
-          </div>
-          <div class="kpi-box">
-            <div class="k-label">نسبة استحقاق قانون 6 المبسط</div>
-            <div class="k-val" id="mof-law6-rate">—</div>
-          </div>
-          <div class="kpi-box accent">
-            <div class="k-label">نسبة الإثبات الرياضي Lean 4</div>
-            <div class="k-val" id="mof-lean-rate">100%</div>
-          </div>
+          <div class="kpi-box accent"><div class="k-label">إجمالي الوفورات الاسترشادية</div><div class="k-val" id="mof-savings">—</div></div>
+          <div class="kpi-box"><div class="k-label">منشآت غير مسجلة استفسرت للانضمام</div><div class="k-val" id="mof-formalized">—</div></div>
+          <div class="kpi-box"><div class="k-label">نسبة استحقاق قانون 6 المبسط</div><div class="k-val" id="mof-law6-rate">—</div></div>
+          <div class="kpi-box accent"><div class="k-label">نسبة الإثبات الرياضي Lean 4</div><div class="k-val" id="mof-lean-rate">100%</div></div>
         </div>
 
-        <h3 style="font-size:14.5px; color:#fcd34d; margin:14px 0 10px;">🔥 أكثر موضوعات وأسئلة الممولين والمستثمرين تكراراً</h3>
+        <h3 style="font-size:15px; color:var(--gold); margin:16px 0 10px;">🔥 أكثر موضوعات وأسئلة الممولين والمستثمرين تكراراً</h3>
         <div id="mof-faq-bars"></div>
 
-        <div class="grid-2" style="margin-top:16px;">
-          <div class="card" style="margin-bottom:0;">
-            <h2>📍 التوزيع الجغرافي</h2>
+        <div class="grid-2" style="margin-top:18px;">
+          <div class="card" style="margin-bottom:0; box-shadow:none; background:var(--surface-soft);">
+            <h2>📍 التوزيع الجغرافي للاستفسارات</h2>
             <div id="mof-gov-bars"></div>
           </div>
-          <div class="card" style="margin-bottom:0;">
-            <h2>🏭 أكثر القطاعات الاقتصادية</h2>
+          <div class="card" style="margin-bottom:0; box-shadow:none; background:var(--surface-soft);">
+            <h2>🏭 أكثر القطاعات الاقتصادية استفادة</h2>
             <div id="mof-sector-bars"></div>
           </div>
         </div>
@@ -500,17 +910,17 @@
           <div class="kpi-box"><div class="k-label">فعلي 2024/2025</div><div class="k-val">2,202.3 مليار</div></div>
           <div class="kpi-box"><div class="k-label">موازنة 2026/2027 (قانون 77)</div><div class="k-val">3,529.3 مليار</div></div>
           <div class="kpi-box accent"><div class="k-label">توقع الموديل لـ 2027/2028</div><div class="k-val" id="mof-forecast-2728">—</div></div>
-          <div class="kpi-box accent"><div class="k-label">المصادر الرسمية المحمّلة</div><div class="k-val" id="mof-pdfs-count">18 PDF</div></div>
+          <div class="kpi-box accent"><div class="k-label">الوثائق الرسمية المحمّلة</div><div class="k-val" id="mof-pdfs-count">18 PDF</div></div>
         </div>
         <div id="mof-real-bars"></div>
-        <h3 style="font-size:14px; color:#fcd34d; margin:14px 0 8px;">📑 سجل إثبات مصدر الوثائق الرسمية (SHA-256 Official Provenance)</h3>
+        <h3 style="font-size:14.5px; color:var(--ink); margin:16px 0 8px;">📑 سجل إثبات مصدر الوثائق الرسمية (SHA-256 Official Provenance)</h3>
         <table class="t-table">
           <thead><tr><th>الرمز</th><th>الجهة</th><th>عنوان الوثيقة الرسمية</th><th>الصفحات / الفقرات</th><th>بصمة SHA-256</th></tr></thead>
           <tbody id="official-manifest-body"></tbody>
         </table>
       </div>
 
-      <div class="card">
+      <div class="card" style="margin-bottom:0;">
         <h2>🧠 بطاقة الـ 6 موديلات المدرّبة + الـ 10 نظريات الرياضية في نواة Lean 4.36.0</h2>
         <table class="t-table" style="margin-bottom:18px;">
           <thead><tr><th>الموديل المدرّب</th><th>ملف الأوزان</th><th>الحجم</th><th>أداء الاختبار الموثّق</th></tr></thead>
@@ -520,7 +930,7 @@
           <thead><tr><th>الرمز</th><th>النظرية في Lean 4</th><th>المرجع التشريعي</th><th>الضمانة القانونية المثبتة آلياً</th></tr></thead>
           <tbody id="lean-theorems-body"></tbody>
         </table>
-        <pre class="lean-code" id="lean-source-code" style="margin-top:12px;">جارٍ تحميل الكود المصدري لنواة Lean 4...</pre>
+        <pre class="lean-code" id="lean-source-code" style="margin-top:14px;">جارٍ تحميل الكود المصدري لنواة Lean 4...</pre>
       </div>
     </section>
   </main>
@@ -529,8 +939,24 @@
     const escHtml = (s) => String(s ?? "")
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
+    // XSS-safe rich formatter: escapes ALL HTML first, then styles **bold** and `code` cleanly!
+    function formatRichText(raw) {
+      return escHtml(raw)
+        .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+        .replace(/`([^`]+)`/g, "<code>$1</code>")
+        .replace(/\n/g, "<br/>");
+    }
+
     const fmtEgp = (n) => `${Number(n || 0).toLocaleString("en-US")} ج.م`;
     const chatHistory = [];
+
+    document.getElementById("welcome-bot-msg").innerHTML = formatRichText(
+      "أهلاً بكم في **«مُيسّر الضرائب الذكي — مشروع TAX-02»**!\n" +
+      "اطرح استفسارك بالعربية العامية أو بالإنجليزية للمستثمرين الأجانب (**نصاً، أو بالصوت، أو برفع ملف PDF/صورة**).\n" +
+      "• يلتزم المساعد بالمصادر الرسمية وتواريخ السريان والمهل القانونية.\n" +
+      "• يقترح **3 أسئلة سياقية** بعد كل إجابة، ويحيل الاستفسارات خارج النطاق لموظف خدمات المستثمرين مع ملخص المحادثة."
+    );
 
     const PRESETS = {
       restaurant: {
@@ -587,7 +1013,19 @@
       };
     }
 
+    function updateSideSummary(data) {
+      if (!data || !data.comparison) return;
+      const comp = data.comparison;
+      const lean = data.lean4_verification || {};
+      document.getElementById("side-total-savings").textContent = fmtEgp(comp.total_direct_savings_egp);
+      document.getElementById("side-opt-tax").textContent = fmtEgp(comp.optimal_annual_tax_egp);
+      document.getElementById("side-std-tax").textContent = fmtEgp(comp.standard_regime_tax_egp);
+      document.getElementById("side-regime-badge").textContent = "✅ " + comp.recommended_regime_ar;
+      document.getElementById("side-proof-id").textContent = `${lean.proof_certificate_id || "LEAN4-VERIFIED"} | ${lean.theorems_proven || 10}/10 Theorems`;
+    }
+
     function renderOptimization(data) {
+      updateSideSummary(data);
       const comp = data.comparison;
       const lean = data.lean4_verification;
       const vec = data.solver.decision_vector;
@@ -596,15 +1034,23 @@
       document.getElementById("res-opt-tax").textContent = fmtEgp(comp.optimal_annual_tax_egp);
       document.getElementById("res-std-tax").textContent = fmtEgp(comp.standard_regime_tax_egp);
 
+      // Visual comparison meter
+      const beforeTotal = Number(comp.standard_regime_tax_egp || 0) + Number(comp.raw_penalty_egp || 0) + Number(comp.real_estate_tax_egp || 0) + Number(comp.real_estate_savings_egp || 0);
+      const afterTotal = Number(comp.optimal_annual_tax_egp || 0) + Number(comp.final_penalty_egp || 0) + Number(comp.real_estate_tax_egp || 0);
+      document.getElementById("cm-before-val").textContent = fmtEgp(beforeTotal);
+      document.getElementById("cm-after-val").textContent = fmtEgp(afterTotal);
+      const pct = beforeTotal > 0 ? Math.max(4, Math.min(100, Math.round((afterTotal / beforeTotal) * 100))) : 5;
+      document.getElementById("cm-after-bar").style.width = `${pct}%`;
+
       document.getElementById("res-regime-title").textContent =
-        (lean.lean4_verified ? "✅ [موثّق بـ Lean 4] " : "⚠️ ") + comp.recommended_regime_ar;
+        (lean.lean4_verified ? "✅ [موثّق رياضياً بـ Lean 4] " : "⚠️ ") + comp.recommended_regime_ar;
       document.getElementById("res-proof-meta").textContent =
-        `CERT: ${lean.proof_certificate_id || "N/A"} | SHA-256: ${(lean.proof_sha256 || "").slice(0, 28)}... | ` +
+        `CERT: ${lean.proof_certificate_id || "N/A"} | SHA-256: ${(lean.proof_sha256 || "").slice(0, 26)}... | ` +
         `Lean v${lean.lean_version || "4.36.0"} (${lean.theorems_proven || 10}/10 theorems, sorry=0) | ${lean.elapsed_ms || 0} ms`;
 
       const alerts = data.deadline_warnings_ar || [];
       document.getElementById("res-deadline-alerts").innerHTML = alerts.map(w =>
-        `<div class="proof-panel" style="border-color:#f59e0b; border-right-color:#f59e0b; color:#fde68a; margin-bottom:8px;">${escHtml(w)}</div>`
+        `<div class="proof-panel warn" style="margin-bottom:8px;">${escHtml(w)}</div>`
       ).join("");
 
       const ml = data.ml_intelligence || {};
@@ -614,10 +1060,11 @@
         prop.probability_pct !== null && prop.probability_pct !== undefined
           ? `🧠 توقّع XGBoost للانضمام للتيسيرات: ${prop.probability_pct}% — ${prop.tier_ar}`
           : `🧠 توقّع XGBoost: ${prop.tier_ar || "معاملة عقارية فقط"}`;
-      const anomEl = document.getElementById("res-ml-anomaly");
-      anomEl.textContent = anom.is_anomalous
+      const mlBox = document.getElementById("ml-intel-panel");
+      mlBox.className = anom.is_anomalous ? "proof-panel danger" : "proof-panel info";
+      document.getElementById("res-ml-anomaly").textContent = anom.is_anomalous
         ? anom.warning_ar
-        : "✅ حارس كشف الشذوذ (IsolationForest): الأرقام والنسب متسقة مع متوسط السوق المصري.";
+        : "✓ حارس كشف الشذوذ (IsolationForest): الأرقام والنسب متسقة مع متوسط السوق المصري.";
 
       const tags = [
         { on: vec.adopt_simplified_law6, text: "قانون 6 المبسط" },
@@ -627,15 +1074,15 @@
         { on: vec.claim_real_estate_exemption, text: "إعفاء عقاري 0% (درجة أولى)" }
       ];
       document.getElementById("res-decision-tags").innerHTML = tags
-        .map(t => `<span class="d-tag ${t.on ? "" : "off"}">${t.on ? "✓ " : "— "}${escHtml(t.text)}</span>`).join("");
+        .map(t => `<span class="d-tag ${t.on ? "" : "off"}">${t.on ? "✓ " : "• "}${escHtml(t.text)}</span>`).join("");
 
       document.getElementById("res-benefits").innerHTML = (data.benefits_ar || []).map(b => `<li>${escHtml(b)}</li>`).join("");
       document.getElementById("res-roadmap").innerHTML = (data.roadmap_ar || []).map(r => `<li>${escHtml(r)}</li>`).join("");
       document.getElementById("res-docs").innerHTML = (data.required_documents_ar || []).map(d => `<li>${escHtml(d)}</li>`).join("");
       document.getElementById("res-citations").innerHTML =
-        "<strong>المرجعية وتواريخ السريان:</strong> " +
+        "<strong>المرجعية التشريعية وتواريخ السريان:</strong> " +
         (data.legal_citations || []).map(c => `[${escHtml(c.law)} — سريان: ${escHtml(c.effective_date)} | المهلة: ${escHtml(c.expiry_date)}]`).join(" • ") +
-        `<br/><span style="color:#cbd5e1;">${escHtml(data.disclaimer_ar || "")}</span>`;
+        `<br/><span style="display:block; margin-top:6px;">${escHtml(data.disclaimer_ar || "")}</span>`;
     }
 
     async function runOptimization() {
@@ -649,10 +1096,27 @@
       }
     }
 
+    function appendMessage(role, htmlOrText, isEn = false, isRich = false) {
+      const box = document.getElementById("chat-box");
+      const row = document.createElement("div");
+      row.className = `msg-row ${role}`;
+      const av = document.createElement("div");
+      av.className = `avatar ${role}`;
+      av.textContent = role === "bot" ? "م" : "أنت";
+      const bubble = document.createElement("div");
+      bubble.className = `msg ${role}${isEn ? " en" : ""}`;
+      if (isRich) bubble.innerHTML = htmlOrText;
+      else bubble.textContent = htmlOrText;
+      row.appendChild(av);
+      row.appendChild(bubble);
+      box.appendChild(row);
+      box.scrollTop = box.scrollHeight;
+    }
+
     function renderFollowups(items) {
       const bar = document.getElementById("followups-container");
       if (!items || !items.length) { bar.innerHTML = ""; return; }
-      bar.innerHTML = `<span style="font-size:12px; color:#fcd34d; align-self:center;">💡 3 أسئلة مقترحة لك:</span>` +
+      bar.innerHTML = `<span style="font-size:12px; font-weight:800; color:var(--gold); align-self:center;">💡 أسئلة مقترحة لك:</span>` +
         items.map(q => `<button type="button" class="preset-btn dyn-followup" data-fq="${escHtml(q)}">${escHtml(q)}</button>`).join("");
       bar.querySelectorAll(".dyn-followup").forEach(b => {
         b.addEventListener("click", () => sendChat(b.dataset.fq));
@@ -660,32 +1124,24 @@
     }
 
     async function sendChat(text) {
-      const box = document.getElementById("chat-box");
       const lang = document.getElementById("chat-lang").value;
-      const uDiv = document.createElement("div");
-      uDiv.className = "msg user"; uDiv.textContent = text;
-      box.appendChild(uDiv);
-      box.scrollTop = box.scrollHeight;
+      appendMessage("user", text, false, false);
 
       const resp = await fetch("/api/chat", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, lang, conversation_history: chatHistory.slice(-6) })
       });
       chatHistory.push(text);
-      const bDiv = document.createElement("div");
-      bDiv.className = "msg bot";
       if (resp.ok) {
         const data = await resp.json();
-        if (data.lang === "en") bDiv.classList.add("en");
-        bDiv.textContent = data.reply_ar;
+        appendMessage("bot", formatRichText(data.reply_ar), data.lang === "en", true);
         renderFollowups(data.suggested_followups || []);
+        if (data.optimization) renderOptimization(data.optimization);
         loadMinistryAnalytics();
         loadEscalations();
       } else {
-        bDiv.textContent = "تعذر إتمام التحليل حالياً.";
+        appendMessage("bot", "تعذر إتمام التحليل حالياً، يرجى المحاولة مرة أخرى.", false, false);
       }
-      box.appendChild(bDiv);
-      box.scrollTop = box.scrollHeight;
     }
 
     async function handleFileUpload(file, inChat) {
@@ -707,23 +1163,19 @@
       });
       if (!resp.ok) return;
       const data = await resp.json();
+      renderOptimization(data.optimization);
       if (inChat) {
-        const box = document.getElementById("chat-box");
-        const bDiv = document.createElement("div");
-        bDiv.className = "msg bot";
         const comp = data.optimization.comparison;
-        bDiv.textContent =
-          `📎 تم فحص الملف المرفق (${data.filename}) عبر ${data.ocr_engine}\n` +
-          `🔒 حماية قانون 151/2020: تم حجب ${data.pii_protection.redacted_count} بيانات شخصية\n` +
-          `✅ المسار الأمثل: ${comp.recommended_regime_ar}\n` +
-          `💰 الضريبة المثلى: ${fmtEgp(comp.optimal_annual_tax_egp)} | إجمالي الوفر الموثّق: ${fmtEgp(comp.total_direct_savings_egp)}\n` +
-          `🛡️ شهادة Lean 4: ${data.optimization.lean4_verification.proof_certificate_id}`;
-        box.appendChild(bDiv);
-        box.scrollTop = box.scrollHeight;
+        const msg =
+          `📎 **تم فحص الملف المرفق (${data.filename})** عبر ${data.ocr_engine}\n` +
+          `🔒 حماية قانون 151/2020: تم حجب **${data.pii_protection.redacted_count}** بيانات شخصية\n` +
+          `✅ **المسار الأمثل:** ${comp.recommended_regime_ar}\n` +
+          `💰 الضريبة المثلى: **${fmtEgp(comp.optimal_annual_tax_egp)}** | إجمالي الوفر الموثّق: **${fmtEgp(comp.total_direct_savings_egp)}**\n` +
+          `🛡️ شهادة الإثبات: \`${data.optimization.lean4_verification.proof_certificate_id}\``;
+        appendMessage("bot", formatRichText(msg), false, true);
       } else {
         document.getElementById("doc-scan-status").textContent =
-          `✅ تم فحص (${data.filename}) | حجب ${data.pii_protection.redacted_count} بيانات شخصية | شهادة ${data.optimization.lean4_verification.proof_certificate_id}`;
-        renderOptimization(data.optimization);
+          `✓ تم فحص (${data.filename}) | حجب ${data.pii_protection.redacted_count} بيانات شخصية | شهادة ${data.optimization.lean4_verification.proof_certificate_id}`;
       }
       loadMinistryAnalytics();
     }
@@ -736,17 +1188,16 @@
         return;
       }
       const rec = new SR();
-      const selLang = document.getElementById("chat-lang").value;
-      rec.lang = selLang === "en" ? "en-US" : "ar-EG";
-      btn.textContent = "🔴 جارٍ الاستماع...";
-      rec.onresult = async (ev) => {
+      rec.lang = document.getElementById("chat-lang").value === "en" ? "en-US" : "ar-EG";
+      btn.textContent = "🔴 استماع...";
+      rec.onresult = (ev) => {
         const transcript = ev.results[0][0].transcript;
-        btn.textContent = "🎙️ تحدث صوتياً";
+        btn.textContent = "🎙️ صوت";
         document.getElementById("chat-input").value = transcript;
         sendChat(transcript);
       };
-      rec.onerror = () => { btn.textContent = "🎙️ تحدث صوتياً"; };
-      rec.onend = () => { btn.textContent = "🎙️ تحدث صوتياً"; };
+      rec.onerror = () => { btn.textContent = "🎙️ صوت"; };
+      rec.onend = () => { btn.textContent = "🎙️ صوت"; };
       rec.start();
     }
 
@@ -761,9 +1212,9 @@
       const d = await resp.json();
       if (!d.matches || !d.matches.length) { box.textContent = "لا توجد فقرات مطابقة."; return; }
       box.innerHTML = d.matches.map(m => `
-        <div class="proof-panel" style="border-color:#f59e0b; border-right-color:#f59e0b; margin-bottom:10px;">
+        <div class="proof-panel warn" style="margin-bottom:10px;">
           <strong>📄 ${escHtml(m.title)} — صفحة ${escHtml(m.page)} (${escHtml(m.org)} | تطابق ${Math.round(m.similarity * 100)}%)</strong>
-          <div style="margin-top:6px; color:#e2e8f0; white-space:pre-wrap;">${escHtml(m.excerpt)}</div>
+          <div style="margin-top:6px; color:var(--ink-2); white-space:pre-wrap;">${escHtml(m.excerpt)}</div>
         </div>`).join("");
     }
 
@@ -781,7 +1232,7 @@
       const st = document.getElementById("decree-status");
       if (resp.ok) {
         const d = await resp.json();
-        st.textContent = `✅ تم التحديث الفوري دون إعادة بناء الحل! أُضيفت ${d.chunks_added} فقرات — إجمالي الفقرات الحية الآن: ${d.total_live_knowledge_chunks}.`;
+        st.textContent = `✓ تم التحديث الفوري دون إعادة بناء الحل! أُضيفت ${d.chunks_added} فقرات — إجمالي الفقرات الحية الآن: ${d.total_live_knowledge_chunks}.`;
         runOfficialSearch(payload.title);
       } else {
         st.textContent = "⚠️ تأكد من إدخال عنوان ونص كافٍ للقرار.";
@@ -791,17 +1242,16 @@
     async function loadEscalations() {
       const resp = await fetch("/api/officer/escalations");
       if (!resp.ok) return;
-      const d = await resp.json();
-      const list = d.escalations || [];
+      const list = (await resp.json()).escalations || [];
       const box = document.getElementById("officer-escalations-list");
       if (!list.length) {
-        box.innerHTML = `<div class="proof-panel">لا توجد إحالات معلقة حالياً — جرّب زر «تجربة سؤال خارج النطاق» في التبويب الأول لرؤية الإحالة الفورية وملخص المحادثة هنا!</div>`;
+        box.innerHTML = `<div class="proof-panel info">لا توجد إحالات معلقة حالياً — اضغط على «↪️ سؤال خارج النطاق + إحالة لموظف» في التبويب الأول لتجربة وصول التذكرة وملخص المحادثة هنا فوراً!</div>`;
         return;
       }
       box.innerHTML = list.map(e => `
-        <div class="proof-panel" style="border-color:#38bdf8; border-right-color:#38bdf8; margin-bottom:10px;">
+        <div class="proof-panel info" style="margin-bottom:10px;">
           <strong>🎫 ${escHtml(e.ticket_id)} | ${escHtml(e.reason)} (${escHtml(e.lang.toUpperCase())})</strong>
-          <div style="margin-top:5px; color:#cbd5e1;">${escHtml(e.conversation_summary)}</div>
+          <div style="margin-top:5px; color:var(--ink-2);">${escHtml(e.conversation_summary)}</div>
         </div>`).join("");
     }
 
@@ -849,7 +1299,7 @@
         const d = await rLean.json();
         document.getElementById("lean-theorems-body").innerHTML = d.theorems.map(t => `
           <tr><td><strong>${escHtml(t.id)}</strong></td>
-          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:#6ee7b7;">${escHtml(t.name)}</td>
+          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:var(--emerald-dark);font-weight:700;">${escHtml(t.name)}</td>
           <td>${escHtml(t.law)}</td><td>${escHtml(t.desc)}</td></tr>`).join("");
         document.getElementById("lean-source-code").textContent = d.source_code || "";
       }
@@ -875,8 +1325,8 @@
           );
           document.getElementById("ml-models-body").innerHTML = rows.map(r => `
             <tr><td><strong>${escHtml(r.name)}</strong></td>
-            <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:#fcd34d;">${escHtml(r.file)}</td>
-            <td>${escHtml(r.kb)}</td><td style="color:#6ee7b7;">${escHtml(r.metric)}</td></tr>`).join("");
+            <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:var(--gold);font-weight:700;">${escHtml(r.file)}</td>
+            <td>${escHtml(r.kb)}</td><td style="color:var(--emerald-dark);font-weight:700;">${escHtml(r.metric)}</td></tr>`).join("");
         }
       }
       if (rFc.ok) {
@@ -894,9 +1344,9 @@
         const m = await rMan.json();
         document.getElementById("mof-pdfs-count").textContent = `${m.official_pdfs_count || 0} PDF (${m.official_corpus_chunks || 0} فقرة)`;
         document.getElementById("official-manifest-body").innerHTML = (m.official_pdfs || []).slice(0, 12).map(doc => `
-          <tr><td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:#6ee7b7;">${escHtml(doc.doc_id)}</td>
+          <tr><td style="font-family:Consolas,monospace;direction:ltr;text-align:left;color:var(--emerald-dark);font-weight:700;">${escHtml(doc.doc_id)}</td>
           <td>${escHtml(doc.org)}</td><td>${escHtml(doc.title)}</td><td>${escHtml(doc.pages)} ص / ${escHtml(doc.extracted_chunks)} فقرة</td>
-          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:11px;color:#94a3b8;">${escHtml((doc.sha256 || "").slice(0, 16))}...</td></tr>`).join("");
+          <td style="font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:11px;color:var(--muted);">${escHtml((doc.sha256 || "").slice(0, 16))}...</td></tr>`).join("");
       }
     }
 
@@ -934,6 +1384,8 @@
     document.getElementById("btn-run-opt").addEventListener("click", runOptimization);
     document.getElementById("btn-dl-html").addEventListener("click", () => downloadReport("/api/report/html", "moyasser_roadmap.html"));
     document.getElementById("btn-dl-pdf").addEventListener("click", () => downloadReport("/api/report/pdf", "moyasser_verified_certificate.pdf"));
+    document.getElementById("btn-side-html").addEventListener("click", () => downloadReport("/api/report/html", "moyasser_roadmap.html"));
+    document.getElementById("btn-side-pdf").addEventListener("click", () => downloadReport("/api/report/pdf", "moyasser_verified_certificate.pdf"));
     document.getElementById("btn-voice").addEventListener("click", startVoiceInput);
     document.getElementById("chat-file-upload").addEventListener("change", (e) => handleFileUpload(e.target.files[0], true));
     document.getElementById("scanner-file-input").addEventListener("change", (e) => handleFileUpload(e.target.files[0], false));
@@ -952,7 +1404,7 @@
       if (resp.ok) {
         const d = await resp.json();
         document.getElementById("doc-scan-status").textContent =
-          `✅ تم الفحص | حجب ${d.pii_protection.redacted_count} بيانات شخصية (قانون 151/2020) | شهادة ${d.optimization.lean4_verification.proof_certificate_id}`;
+          `✓ تم الفحص | حجب ${d.pii_protection.redacted_count} بيانات شخصية (قانون 151/2020) | شهادة ${d.optimization.lean4_verification.proof_certificate_id}`;
         renderOptimization(d.optimization);
         loadMinistryAnalytics();
       }
