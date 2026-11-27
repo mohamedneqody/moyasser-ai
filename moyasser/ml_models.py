@@ -160,10 +160,14 @@ def _load_official_rag_bundle():
         # Hot-merge any dynamically added decrees/circulars WITHOUT rebuilding models!
         dyn_path = _dynamic_decrees_path()
         if os.path.exists(dyn_path):
-            with open(dyn_path, "r", encoding="utf-8") as fh:
+            with open(dyn_path, "r", encoding="utf-8-sig") as fh:
                 for line in fh:
-                    if line.strip():
-                        records.append(json.loads(line))
+                    clean_ln = line.lstrip("\ufeff").strip()
+                    if clean_ln:
+                        try:
+                            records.append(json.loads(clean_ln))
+                        except json.JSONDecodeError:
+                            continue
 
         # Index BOTH title and clause body so searching by decree/law title OR content ranks accurately
         clean_texts = [normalize_arabic_text(f"{r.get('title', '')} {r.get('text', '')}") for r in records]

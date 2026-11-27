@@ -139,6 +139,11 @@ def serve_home():
     return FileResponse(os.path.join(_STATIC_DIR, "index.html"), media_type="text/html; charset=utf-8")
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def serve_favicon():
+    return Response(status_code=204)
+
+
 @app.get("/pitch-deck", include_in_schema=False)
 def serve_pitch_deck():
     if os.path.exists(_PITCH_DECK):
