@@ -35,8 +35,8 @@ _PITCH_DECK = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "doc
 
 app = FastAPI(
     title="Moyasser AI — مُيسّر الضرائب الذكي (TAX-02)",
-    description="Neuro-Symbolic Formally Verified Egyptian Tax Facilitation Assistant (HiGHS MILP + Lean 4 + Official RAG)",
-    version="2.0.0",
+    description="Sovereign Bilingual Neuro-Symbolic Egyptian Tax Facilitation Assistant (HiGHS MILP + Lean 4 + Official RAG + Ollama)",
+    version="2.5.0",
     docs_url=None,
     redoc_url=None,
     openapi_url=None,

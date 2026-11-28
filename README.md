@@ -1,21 +1,23 @@
-# مُيسّر الضرائب الذكي — Moyasser AI v2.0 🇪🇬
-### Bilingual Neuro-Symbolic & Formally Verified Egyptian Tax Facilitation Assistant
+# مُيسّر الضرائب الذكي — Moyasser AI v2.5 🇪🇬
+### Sovereign Bilingual Neuro-Symbolic & Formally Verified Egyptian Tax Facilitation Assistant
 **Official Submission for Egyptian Ministry of Finance & MCIT / ITIDA (`SECC`) Impact Hackathon — Challenge `TAX-02` (`مساعد ذكى للتيسيرات الضريبية`)**
+
+[![CI — Lean 4 & 14-Test Suite](https://github.com/mohamedneqody/moyasser-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/mohamedneqody/moyasser-ai/actions/workflows/ci.yml)
 
 ---
 
 ## Key Highlights
 - **100% `TAX-02` Specification Coverage (External Taxpayer/Foreign-Investor Track + Internal ETA Specialist Track)**:
   - **Bilingual (`AR` Colloquial -> Simplified MSA + `EN` Foreign Investors)** across **Text, Live Voice (`Web Speech` + `/api/voice-query`), and Uploaded PDF/Scanned Notices (`pypdfium2`)**.
-  - **Statutory Effective & Expiry Date Guard** (flags expired windows like Law 5/2025's initial `2025-08-12` deadline while highlighting permanent Law 6/2025 and Law 152/2026's `2026-12-31` window) + **Mandatory Non-Binding Disclaimer**.
-  - **3 Contextual Follow-Up Suggestions** after every answer + **Out-of-Scope Polite Refusal & Specialist Escalation (`ETA-ESC-...`)** with sanitized conversation summaries.
-  - **Zero-Rebuild Hot-Reloadable Decree Ingestion** (`POST /api/knowledge/ingest-decree`) + **Top Frequent Questions Dashboard**.
-  - **Strict Compliance with Egyptian Personal Data Protection Law No. 151 of 2020** (never requests National ID / Tax Reg ID; auto-redacts accidental PII).
+  - **Dialect Grounding X-Ray (`PyTorch BiGRU Slot Tagger`)**: Compiles spoken Egyptian phrases (`ميتين ألف في الشهر`, `مليون ونص`, `ومعليش غرامات`) into annualized EGP figures and visual X-Ray proof pills before calculation.
+  - **100% On-Premise Sovereign Local LLM Mode (`Ollama: Qwen-Hybrid & Liquid LFM-Q4`)**: Optional zero-cloud advisory mode governed by a strict **Lean 4 Post-Generation Numeric Hallucination Firewall** and **Law No. 151/2020 Anonymous-by-Design PII Shield** (auto-redacting multi-turn history and uploaded documents).
+  - **Statutory Effective & Expiry Date Guard** + **Mandatory Non-Binding Disclaimer** + **3 Contextual Follow-Up Suggestions** + **Out-of-Scope Polite Refusal & Escalation (`ETA-ESC-...`)**.
+  - **Authorized Zero-Rebuild Hot-Reloadable Decree Ingestion** (`POST /api/knowledge/ingest-decree` protected by constant-time `X-ETA-Officer-Key` verification) + **Top Frequent Questions Dashboard**.
 - **Zero Numeric Hallucination (`SciPy HiGHS MILP` + Native `Lean 4.36.0` Kernel)**:
   - **10 Machine-Checked Formal Theorems (`0 sorry`)** compiled to `moyasser_verifier.exe`, issuing `SHA-256` Proof Certificates (`LEAN4-PROOF-...`) in `< 40 ms`.
-- **100% Real Official MoF & ETA Data + 6 Trained AI/ML Models**:
+- **100% Real Official MoF & ETA Data + 7 Trained AI/ML Models**:
   - **18 Official PDFs (`437` verbatim clauses)** downloaded from `eta.gov.eg` & `media.mof.gov.eg` (Laws 5–7/2025, Laws 148–153/2026, Oct 2026 Real Estate FAQ, Oct 2026 MoF Monthly Financial Report) + 22-year fiscal panel (`2002–2027`).
-- **SECC Security Gate Certified**: Audited live with `cyberguard-verify v3.3` (**`SECURE` — `0` vulnerabilities, `100%` attack-surface coverage**).
+- **CI/CD & SECC Security Verified**: Passing **GitHub Actions** (`Lean 4.36.0` compile + `14/14 pytest` suite), audited with `cyberguard-verify v3.3` (**`0` vulnerabilities**).
 
 ---
 

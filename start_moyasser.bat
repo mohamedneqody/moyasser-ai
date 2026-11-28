@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 echo ============================================================================
-echo   Moyasser AI v2.1 (Track TAX-02) - Ministry of Finance Impact Hackathon
+echo   Moyasser AI v2.5 (Track TAX-02) - Ministry of Finance Impact Hackathon
 echo   Starting server and waiting until http://127.0.0.1:8080 is ready...
 echo ============================================================================
 cd /d "%~dp0"
